@@ -1,0 +1,185 @@
+.hero {
+  position: relative;
+  height: 100svh;
+  min-height: 660px;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--ink);
+}
+
+/* ── WebGL sun ─────────────────────────────── */
+.sun { position: absolute; inset: 0; }
+.sun canvas { width: 100%; height: 100%; }
+.sun--fallback canvas { display: none; }
+.sun--rise.sun--fallback {
+  background:
+    radial-gradient(circle at 72% 111%, #fff4d6 0, #ffb23f 22%, #ff5a1f 40%, rgb(255 90 31 / 0.18) 55%, transparent 75%),
+    #0d0c0a;
+}
+
+.hero__sun { z-index: -2; }
+
+.hero__shade {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgb(13 12 10 / 0.6) 0%, transparent 26%),
+    radial-gradient(80% 70% at 0% 100%, rgb(13 12 10 / 0.55), transparent 70%);
+}
+
+.hero__inner {
+  position: relative;
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding-top: calc(var(--nav-h) + clamp(10px, 2.6vh, 28px));
+  padding-bottom: clamp(28px, 5.5vh, 60px);
+}
+
+/* ── Meta row ──────────────────────────────── */
+.hero__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 32px;
+}
+
+.hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+}
+
+.hero__pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sun);
+  animation: hero-pulse 2.4s infinite;
+}
+
+@keyframes hero-pulse {
+  0% { box-shadow: 0 0 0 0 rgb(255 90 31 / 0.6); }
+  70% { box-shadow: 0 0 0 11px rgb(255 90 31 / 0); }
+  100% { box-shadow: 0 0 0 0 rgb(255 90 31 / 0); }
+}
+
+/* Live readout */
+.readout {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.readout > div {
+  display: grid;
+  grid-template-columns: 74px auto;
+  gap: 14px;
+}
+.readout dt { color: var(--muted); }
+.readout dd { margin: 0; font-variant-numeric: tabular-nums; text-align: right; }
+
+.readout__status { margin-top: 6px; }
+.readout__status dd {
+  grid-column: 1 / -1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  color: var(--gold);
+}
+.readout__status i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 10px currentColor;
+}
+.readout__status--night dd { color: var(--muted); }
+
+/* ── Headline ──────────────────────────────── */
+.hero__title {
+  align-self: center;
+  margin-top: 1vh;
+  font-family: var(--sans);
+  font-stretch: 62%;
+  font-weight: 800;
+  font-size: clamp(3.7rem, min(10.6vw, 17.6vh), 13rem);
+  line-height: 0.84;
+  letter-spacing: -0.012em;
+  text-transform: uppercase;
+}
+
+.hero__line {
+  display: block;
+  overflow: hidden;
+  padding: 0.03em 0 0.07em;
+  margin-bottom: -0.1em;
+}
+.hero__line > span {
+  display: inline-block;
+  transform-origin: 0% 100%;
+  will-change: transform;
+}
+.hero__line--indent { padding-left: 1.5em; }
+
+/* Split characters: rise individually in the intro and swell under the cursor */
+.hero__title .ch { display: inline-block; }
+.hero__title em { display: inline-block; }
+
+.hero__title em {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.12em;
+  line-height: 0.7;
+  letter-spacing: -0.035em;
+  text-transform: none;
+  color: var(--gold);
+  padding-right: 0.06em;
+}
+
+.hero__title b { font-weight: inherit; color: var(--sun); }
+
+/* ── Bottom row ────────────────────────────── */
+.hero__foot {
+  display: grid;
+  justify-items: start;
+  gap: 26px;
+  max-width: 560px;
+}
+
+.hero__lede {
+  max-width: 44ch;
+  font-size: clamp(1rem, 1.12vw, 1.12rem);
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.hero__ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+
+/* Keeps the ghost button legible when it sits over the sun's glow */
+.hero__ctas .btn--ghost {
+  background: rgb(13 12 10 / 0.38);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+@media (max-width: 860px) {
+  .hero__readout { display: none; }
+  .hero__line--indent { padding-left: 0.9em; }
+}
+
+@media (max-width: 560px) {
+  .hero__shade { background: linear-gradient(0deg, rgb(13 12 10 / 0.55) 0%, transparent 38%), linear-gradient(180deg, rgb(13 12 10 / 0.6) 0%, transparent 26%); }
+  .hero__title { font-size: clamp(3.3rem, 16.5vw, 5rem); align-self: start; margin-top: 7vh; }
+  .hero__foot { gap: 22px; }
+  .hero__ctas { width: 100%; }
+  .hero__ctas .btn { flex: 1 1 100%; justify-content: space-between; }
+}

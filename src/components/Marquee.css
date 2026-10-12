@@ -1,0 +1,73 @@
+.marquee {
+  position: relative;
+  z-index: 3;
+  margin-top: clamp(-70px, -5vw, -36px);
+  padding-block: 8px;
+  overflow-x: clip;
+  pointer-events: none;
+}
+
+.marquee__band {
+  position: relative;
+  z-index: 1;
+  width: 112%;
+  margin-left: -6%;
+  padding-block: clamp(10px, 1.3vw, 18px);
+  background: var(--sun);
+  color: var(--ink);
+  transform: rotate(-2.2deg);
+  overflow: hidden;
+  box-shadow: 0 30px 80px -30px rgb(255 90 31 / 0.55);
+}
+
+.marquee__track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+.marquee__item {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(18px, 2.2vw, 34px);
+  padding-right: clamp(18px, 2.2vw, 34px);
+  font-family: var(--sans);
+  font-stretch: 62%;
+  font-weight: 800;
+  font-size: clamp(2.4rem, 6.2vw, 6.4rem);
+  line-height: 1;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.marquee__item svg {
+  width: 0.56em;
+  height: 0.56em;
+  flex: none;
+  animation: marquee-spin 9s linear infinite;
+}
+
+@keyframes marquee-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Second tape crossing behind the first: ink band, outlined type, opposite direction */
+.marquee__band--back {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  left: 0;
+  padding-block: clamp(8px, 1vw, 14px);
+  background: var(--ink);
+  color: transparent;
+  transform: translateY(-50%) rotate(2.6deg);
+  box-shadow: 0 24px 60px -30px rgb(0 0 0 / 0.6);
+}
+.marquee__band--back .marquee__item {
+  font-family: 'Archivo Variable', 'Anek Tamil Variable', sans-serif;
+  font-size: clamp(2rem, 4.8vw, 4.8rem);
+  color: transparent;
+  -webkit-text-stroke: 1.2px rgb(242 237 228 / 0.6);
+}
+.marquee__band--back .marquee__item svg { color: var(--sun); width: 0.46em; height: 0.46em; }

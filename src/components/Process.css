@@ -1,0 +1,193 @@
+.proc { position: relative; }
+
+.proc__pin {
+  position: relative;
+  height: 100svh;
+  min-height: 640px;
+  overflow: hidden;
+}
+
+.proc__track {
+  --gap: clamp(16px, 1.6vw, 26px);
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--gap);
+  width: max-content;
+  padding: calc(var(--nav-h) + 10px) var(--gutter) 40px;
+  will-change: transform;
+}
+
+/* dashed timeline running behind the cards */
+.proc__track::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* the vertical centre of the cards (content box between the paddings) */
+  top: calc(50% + (var(--nav-h) + 10px - 40px) / 2);
+  height: 1px;
+  background: repeating-linear-gradient(90deg, var(--line) 0 8px, transparent 8px 16px);
+  z-index: -1;
+}
+
+.proc__intro {
+  width: clamp(380px, 44vw, 720px);
+  padding-right: 4vw;
+  display: grid;
+  gap: 28px;
+  align-content: center;
+}
+.proc__intro .title { font-size: clamp(2.7rem, 5.6vw, 6.6rem); }
+
+.proc__hint { display: inline-flex; gap: 10px; color: var(--muted); }
+.proc__hint span { color: var(--sun); animation: proc-nudge 1.6s var(--ease-io) infinite; }
+@keyframes proc-nudge { 50% { transform: translateX(8px); } }
+
+.pcard-wrap { position: relative; flex: none; will-change: transform; }
+
+/* A node on the timeline in the gap after each card; it lights as the card reaches the middle */
+.pcard__node {
+  position: absolute;
+  top: 50%;
+  right: calc(var(--gap) / -2 - 6px);
+  width: 12px;
+  height: 12px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1.5px solid var(--line);
+  transition: background-color 0.5s, border-color 0.5s, box-shadow 0.5s, transform 0.6s var(--ease);
+}
+.pcard-wrap.is-lit .pcard__node {
+  background: var(--sun);
+  border-color: var(--sun);
+  transform: scale(1.15);
+  box-shadow: 0 0 0 5px rgb(255 90 31 / 0.16), 0 0 18px rgb(255 90 31 / 0.7);
+}
+
+.pcard {
+  position: relative;
+  overflow: hidden;
+  flex: none;
+  width: clamp(300px, 27vw, 430px);
+  height: min(66svh, 580px);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 20px;
+  padding: clamp(22px, 2vw, 32px);
+  border-radius: 28px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  transition: border-color 0.4s;
+}
+.pcard:hover { border-color: color-mix(in srgb, var(--fg) 35%, transparent); }
+
+.pcard__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.pcard__num {
+  font-stretch: 62%;
+  font-weight: 800;
+  font-size: clamp(5rem, 8vw, 8rem);
+  line-height: 0.8;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--fg);
+  /* outlined until lit — then a fill wipes in from the left */
+  background: linear-gradient(var(--fg), var(--fg)) 0 0 / 0% 100% no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  transition: background-size 0.9s var(--ease);
+}
+.pcard-wrap.is-lit .pcard__num,
+.pcard:hover .pcard__num { background-size: 100% 100%; }
+
+.pcard__time {
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.pcard__icon {
+  align-self: center;
+  justify-self: center;
+  width: clamp(72px, 7vw, 108px);
+  height: auto;
+  color: var(--sun);
+}
+
+.pcard__title {
+  font-stretch: 66%;
+  font-weight: 760;
+  font-size: clamp(1.8rem, 2.4vw, 2.5rem);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+.pcard__text { margin-top: 12px; color: var(--muted); line-height: 1.5; }
+
+.pcard--sun { background: var(--sun); border-color: var(--sun); color: var(--ink); }
+.pcard--sun .pcard__num {
+  -webkit-text-stroke-color: var(--ink);
+  background-image: linear-gradient(var(--ink), var(--ink));
+}
+.pcard--sun .pcard__time { border-color: rgb(13 12 10 / 0.3); }
+.pcard--sun .pcard__icon { color: var(--ink); }
+.pcard--sun .pcard__text { color: rgb(13 12 10 / 0.75); }
+
+.proc__end {
+  width: clamp(340px, 34vw, 560px);
+  padding-left: 3vw;
+  display: grid;
+  gap: 30px;
+  justify-items: start;
+}
+.proc__end-title {
+  font-size: clamp(1.8rem, 2.8vw, 2.9rem);
+  font-weight: 500;
+  font-stretch: 90%;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+.proc__end-title em { font-family: var(--serif); font-style: italic; color: var(--sun); font-size: 1.1em; }
+
+.proc__bar {
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: 28px;
+  height: 2px;
+  background: var(--line);
+}
+.proc__bar i {
+  display: block;
+  height: 100%;
+  background: var(--sun);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+@media (max-width: 899px) {
+  .proc { padding-block: clamp(96px, 13vw, 160px); }
+  .proc__pin { height: auto; min-height: 0; overflow: visible; }
+  .proc__track {
+    width: auto;
+    height: auto;
+    display: grid;
+    gap: 16px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .proc__track::before,
+  .proc__bar,
+  .proc__hint { display: none; }
+  .proc__intro { width: auto; padding: 0 0 24px; }
+  .pcard { width: auto; height: auto; min-height: 360px; }
+  .pcard-wrap { will-change: auto; }
+  .pcard__node { display: none; }
+  .proc__end { width: auto; padding: 32px 0 0; }
+}

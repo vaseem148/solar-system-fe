@@ -1,0 +1,184 @@
+.sizes__head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 28px 40px;
+  margin-bottom: clamp(44px, 5.5vw, 88px);
+}
+.sizes__head .label { grid-column: 1 / -1; }
+.sizes__head .lede { max-width: 36ch; }
+
+.sizes__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(12px, 1.4vw, 20px);
+}
+
+/* The cell carries the entrance; the card inside carries the pointer tilt + lift (data-tilt) */
+.size-cell { display: grid; }
+
+.size {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  border-radius: 24px;
+  border: 1px solid var(--line);
+  overflow: hidden;
+  background:
+    linear-gradient(rgb(242 237 228 / 0.035) 1px, transparent 1px) 0 0 / 20px 20px,
+    linear-gradient(90deg, rgb(242 237 228 / 0.035) 1px, transparent 1px) 0 0 / 20px 20px,
+    #12110f;
+  transition: border-color 0.5s;
+}
+.size:hover { border-color: rgb(255 90 31 / 0.6); }
+
+/* Grid shimmer — a slow band of sunlight that only catches the blueprint grid lines.
+   The band moves on the compositor; the grid-shaped mask stays put. */
+.size__fx {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask:
+    linear-gradient(#000 1px, transparent 1px) 0 0 / 20px 20px,
+    linear-gradient(90deg, #000 1px, transparent 1px) 0 0 / 20px 20px;
+  mask:
+    linear-gradient(#000 1px, transparent 1px) 0 0 / 20px 20px,
+    linear-gradient(90deg, #000 1px, transparent 1px) 0 0 / 20px 20px;
+}
+.size__fx::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: 0;
+  width: 48%;
+  background: linear-gradient(90deg, transparent, rgb(255 178 63 / 0.42) 50%, transparent);
+  transform: translateX(-130%) skewX(-18deg);
+  animation: size-shimmer 9s linear infinite;
+  animation-delay: calc(var(--i, 0) * 0.34s);
+  animation-play-state: paused;
+  will-change: transform;
+}
+.sizes[data-live] .size__fx::before { animation-play-state: running; }
+
+@keyframes size-shimmer {
+  0% { transform: translateX(-130%) skewX(-18deg); }
+  36%,
+  100% { transform: translateX(260%) skewX(-18deg); }
+}
+
+/* Drawing */
+.plan { width: 100%; height: auto; display: block; }
+
+.plan__reg { stroke: rgb(242 237 228 / 0.35); stroke-width: 1; }
+.plan__wall { fill: none; stroke: rgb(242 237 228 / 0.75); stroke-width: 1.4; }
+.plan__wall--in { stroke-width: 0.7; stroke: rgb(242 237 228 / 0.4); }
+
+.plan__room rect,
+.plan__room line,
+.plan__room path { fill: none; stroke: rgb(242 237 228 / 0.45); stroke-width: 0.8; }
+/* pathLength="1" → dash lengths are fractions of the circumference */
+.plan__tank { fill: none; stroke: rgb(242 237 228 / 0.5); stroke-width: 0.8; stroke-dasharray: 0.035 0.022; }
+.plan__room text,
+.plan__dim text,
+.plan__north text,
+.plan__block text {
+  font-family: var(--mono);
+  font-size: 7.5px;
+  letter-spacing: 0.06em;
+  fill: rgb(242 237 228 / 0.6);
+}
+
+/* Panels are switched on by the scan-line (GSAP drives the fill) */
+.plan__array .pn {
+  fill: rgb(255 178 63 / 0);
+  stroke: var(--gold);
+  stroke-width: 0.8;
+}
+.plan__array .pn-mid { stroke: rgb(255 178 63 / 0.4); stroke-width: 0.5; }
+
+.plan__dim line { stroke: rgb(242 237 228 / 0.5); stroke-width: 0.7; }
+.plan__dim .plan__ext { stroke: rgb(242 237 228 / 0.25); }
+.plan__dim .plan__tick { stroke: var(--sun); stroke-width: 1.1; }
+
+.plan__north circle { fill: none; stroke: rgb(242 237 228 / 0.45); stroke-width: 0.8; }
+.plan__north path { fill: var(--sun); }
+
+.plan__block rect,
+.plan__block line { fill: none; stroke: rgb(242 237 228 / 0.35); stroke-width: 0.7; }
+
+/* Scan-line carriage */
+.plan__scan { opacity: 0; pointer-events: none; }
+.plan__scan-line { stroke: var(--gold); stroke-width: 1; }
+.plan__scan-cap { fill: var(--gold); }
+.plan__scan-wash { transform-box: fill-box; transform-origin: 100% 50%; }
+/* sweeping back (switching off) → the wash trails on the other side */
+.plan__scan[data-dir='back'] .plan__scan-wash { transform: scaleX(-1); }
+
+/* Info */
+.size__info {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 22px 22px 24px;
+  border-top: 1px solid var(--line);
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+}
+
+.size__kw {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-stretch: 62%;
+  font-weight: 800;
+  font-size: clamp(3rem, 4.2vw, 4.4rem);
+  line-height: 0.9;
+}
+.size__kw small {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--sun);
+  letter-spacing: 0.06em;
+}
+
+/* kWp odometer: in-flow digits give the width + baseline, the drums roll over them */
+.kw { display: inline-flex; align-items: baseline; white-space: nowrap; }
+.kw__d { position: relative; display: inline-block; }
+.kw__win {
+  position: absolute;
+  inset: 0;
+  overflow-x: visible;
+  overflow-y: clip;
+  visibility: hidden;
+}
+.kw__strip { display: block; text-align: center; will-change: transform; }
+.kw__strip > span { display: block; }
+
+.size__fit { color: var(--muted); }
+
+.size__specs { display: grid; gap: 7px; margin-top: 8px; font-size: 0.68rem; }
+.size__specs li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 7px;
+  border-top: 1px dashed var(--line);
+}
+.size__specs span { color: var(--muted); }
+
+@media (max-width: 1200px) {
+  .sizes__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .sizes__head { grid-template-columns: 1fr; }
+  .sizes__grid { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .size__fx { display: none; }
+  .size:hover .pn { fill: rgb(255 90 31 / 0.85); }
+}

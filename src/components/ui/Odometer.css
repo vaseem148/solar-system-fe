@@ -1,0 +1,17 @@
+.odo { display: inline-flex; font-variant-numeric: tabular-nums; }
+.odo__digits { display: inline-flex; align-items: baseline; white-space: nowrap; }
+
+/* The ghost digit gives each drum its exact width and baseline; the drum rolls over it */
+.odo__d { position: relative; display: inline-block; }
+.odo__ghost { visibility: hidden; }
+.odo__win {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.odo__strip {
+  display: block;
+  text-align: center;
+  will-change: transform;
+}
+.odo__strip > span { display: block; }
