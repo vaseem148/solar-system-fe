@@ -3,10 +3,10 @@ import { LandscapeRenderer } from '../lib/LandscapeRenderer'
 
 /**
  * Mounts the WebGL landscape. `state` is a plain object the parent animates with GSAP
- * ({ rise, day, mist, cam }); the renderer reads it every frame.
- * `layout` must be a stable (module-level) function.
+ * ({ rise, day, mist, cam, night }); the renderer reads it every frame.
+ * `layout` must be a stable (module-level) function; `palette` is 'sunrise' or 'sunset'.
  */
-export default function Landscape({ layout, state, className = '' }) {
+export default function Landscape({ palette = 'sunrise', layout, state, className = '' }) {
   const host = useRef(null)
   const [failed, setFailed] = useState(false)
 
@@ -17,7 +17,7 @@ export default function Landscape({ layout, state, className = '' }) {
 
     let renderer
     try {
-      renderer = new LandscapeRenderer(canvas, { layout, state })
+      renderer = new LandscapeRenderer(canvas, { palette, layout, state })
     } catch (err) {
       console.warn('Landscape shader unavailable, using CSS fallback:', err)
       canvas.remove()
@@ -39,7 +39,7 @@ export default function Landscape({ layout, state, className = '' }) {
       renderer.destroy()
       canvas.remove()
     }
-  }, [layout, state])
+  }, [palette, layout, state])
 
   return <div ref={host} className={`land ${failed ? 'land--fallback' : ''} ${className}`} aria-hidden="true" />
 }

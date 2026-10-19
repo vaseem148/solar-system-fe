@@ -16,10 +16,11 @@ uniform float uTime;
 uniform float uRise;   // 0 sun below the peaks … 1 sun well up
 uniform float uMist;   // valley mist, 0 … 1
 uniform float uCam;    // slow camera rise, 0 … 1
+uniform float uNight;  // stars coming out, 0 … 1
 uniform vec2 uMouse;
 uniform vec4 uSun;     // x, y (scene units, fully risen), radius, how far below it starts
 uniform vec4 uFrame;   // horizon, vertical scale, house x, house size
-uniform vec4 uFx;      // god rays, cloud shadows, sky clouds, detail
+uniform vec4 uFx;      // god rays, cloud shadows, mist + sky clouds, lone tree on the hill
 uniform vec3 uSkyTop;
 uniform vec3 uSkyMid;
 uniform vec3 uSkyLow;
@@ -174,7 +175,7 @@ float trees(vec2 q, float cell, float hMin, float hMax, float density, float aut
 
 vec3 treeCol(float id, float side, float light) {
   vec3 c = uForest * (0.8 + 0.4 * fract(id));
-  if (id > 1.0) c = mix(vec3(0.72, 0.45, 0.17), vec3(0.82, 0.64, 0.25), fract(id));
+  if (id > 1.0) c = mix(vec3(0.72, 0.45, 0.17), vec3(0.82, 0.64, 0.25), fract(id)) * (1.0 - 0.65 * uNight);
   float lit = clamp(0.5 + 0.5 * side * (SUN.x > ASPECT * 0.5 ? 1.0 : -1.0), 0.0, 1.0);
   return c * (0.78 + 0.5 * lit * light) + uSunCol * 0.06 * lit * light;
 }
@@ -216,7 +217,7 @@ vec3 canopyCol(vec2 p, float x, float y, float light, float autumn) {
   vec3 c = uForest * (0.68 + 0.62 * t);
   // a few autumn crowns scattered through the forest
   float au = smoothstep(0.64, 0.74, fbm2(vec2(x * 18.0 + 7.0, y * 15.0))) * autumn;
-  c = mix(c, mix(vec3(0.62, 0.4, 0.16), vec3(0.76, 0.58, 0.24), t), au * 0.5);
+  c = mix(c, mix(vec3(0.62, 0.4, 0.16), vec3(0.76, 0.58, 0.24), t) * (1.0 - 0.65 * uNight), au * 0.5);
   return mix(c * 0.85, c * 1.3, light * cloudShade(p));
 }
 
@@ -306,7 +307,7 @@ void main() {
       float gl = abs(x - lx) < 0.3 * S ? g6(lx) : 0.0;
       float gh = w > 0.0 && abs(x - hx) < 2.8 * w ? g6(hx) : 0.0;
 
-      if (abs(x - lx) < 0.12 * S && y > gl - 0.02 * S && y < gl + 0.19 * S) {
+      if (uFx.w > 0.5 && abs(x - lx) < 0.12 * S && y > gl - 0.02 * S && y < gl + 0.19 * S) {
         float ls = 0.16 * S;
         vec2 lq = vec2(x - lx, y - gl) / ls;
         float sway = sin(uTime * 0.9) * 0.025 * lq.y;
@@ -345,7 +346,7 @@ void main() {
         float slope = (g6(x + e) - g6(x - e)) / (2.0 * e);
         vec3 c = meadowCol(z, p, x, y, G, slope);
         // the lone tree and the house throw soft shadows away from the sun
-        if (abs(x - lx) < 0.3 * S) {
+        if (uFx.w > 0.5 && abs(x - lx) < 0.3 * S) {
           vec2 sq = (vec2(x, y) - vec2(lx - 0.09 * S, gl - 0.008)) / (0.16 * S);
           c *= 1.0 - 0.3 * exp(-dot(sq * vec2(1.6, 6.0), sq * vec2(1.6, 6.0))) * reach(y);
         }
@@ -476,10 +477,24 @@ void main() {
     float cm = smoothstep(0.55, 0.82, cl) * smoothstep(H + 0.25 * S, H + 0.55 * S, p.y);
     sky = mix(sky, mix(vec3(1.0), uSunCol, 0.25 + 0.4 * exp(-sunD * 1.5)), cm * 0.55);
   }
+  if (uNight > 0.0) {
+    vec2 cell = gl_FragCoord.xy / (uRes.y * 0.035);
+    vec2 ci = floor(cell);
+    float hs = h21(ci + 7.3);
+    if (hs < 0.32) {
+      vec2 sp = ci + 0.5 + (vec2(h21(ci + 1.7), h21(ci + 4.1)) - 0.5) * 0.7;
+      float sd = length(cell - sp) * uRes.y * 0.035;
+      float size = 0.5 + 1.1 * h21(ci + 9.9);
+      float tw = 0.55 + 0.45 * sin(uTime * (0.8 + 2.2 * hs) + hs * 40.0);
+      float star = smoothstep(size + 1.0, 0.0, sd) * tw;
+      sky += vec3(1.0, 0.95, 0.88) * star * uNight * smoothstep(H + 0.3 * S, H + 0.6 * S, p.y) * (1.0 - exp(-sunD * 3.0));
+    }
+  }
   float r = uSun.z;
   float o = max(sunD - r, 0.0);
   sky += uSunCol * (exp(-o * 2.0) * 0.32 + exp(-o * 9.0) * 0.55);
-  sky = mix(sky, mix(vec3(1.0, 0.98, 0.92), uSunCol, 0.15), smoothstep(r + AA, r - AA, sunD));
+  float tint = clamp(1.0 - uSunCol.b * 1.6, 0.15, 0.7);
+  sky = mix(sky, mix(vec3(1.0, 0.98, 0.92), uSunCol, tint), smoothstep(r + AA, r - AA, sunD));
   vec3 col = acc + (1.0 - a) * sky;
 
   // Light scattered through the haze, strongest over the far ranges and in the sky
@@ -523,18 +538,47 @@ const DAY = {
   uShade: '#4a7a47',
   uForest: '#1e3d30',
 }
-const PAL = Object.fromEntries(Object.keys(DAWN).map((k) => [k, [hex(DAWN[k]), hex(DAY[k])]]))
+// Golden hour fades into dusk as `state.day` goes 0 → 1 (the footer's sunset)
+const GOLDEN = {
+  uSkyTop: '#3b4a7a',
+  uSkyMid: '#d7748a',
+  uSkyLow: '#ffc07a',
+  uSunCol: '#ff9a4a',
+  uFar: '#a37a9e',
+  uNear: '#4a3f6a',
+  uMistCol: '#f4b08a',
+  uLit: '#e0b04a',
+  uShade: '#4a4f4a',
+  uForest: '#1f2b2c',
+}
+const DUSK = {
+  uSkyTop: '#151b3d',
+  uSkyMid: '#5b3d72',
+  uSkyLow: '#f2864f',
+  uSunCol: '#ff6a2a',
+  uFar: '#5f4a78',
+  uNear: '#262a4a',
+  uMistCol: '#a8708a',
+  uLit: '#7a6a3a',
+  uShade: '#232b30',
+  uForest: '#121a1d',
+}
 
-const UNIFORMS = ['uRes', 'uTime', 'uRise', 'uMist', 'uCam', 'uMouse', 'uSun', 'uFrame', 'uFx', ...Object.keys(DAWN)]
+const pairs = (from, to) => Object.fromEntries(Object.keys(from).map((k) => [k, [hex(from[k]), hex(to[k])]]))
+const PALETTES = { sunrise: pairs(DAWN, DAY), sunset: pairs(GOLDEN, DUSK) }
+
+const UNIFORMS = ['uRes', 'uTime', 'uRise', 'uMist', 'uCam', 'uNight', 'uMouse', 'uSun', 'uFrame', 'uFx', ...Object.keys(DAWN)]
 
 export class LandscapeRenderer {
   /**
    * @param {HTMLCanvasElement} canvas
-   * @param {{ layout: (w: number, h: number) => { horizon: number, scale: number, sun: [number, number, number, number],
-   *            house: [number, number] }, state: { rise: number, day: number, mist: number, cam: number } }} options
-   *   layout() works in scene units: y 0 (bottom) … 1 (top), x 0 … width / height.
+   * @param {{ palette?: 'sunrise' | 'sunset', layout: (w: number, h: number) => { horizon: number, scale: number,
+   *            sun: [number, number, number, number], house: [number, number], props?: boolean },
+   *            state: { rise: number, day: number, mist: number, cam: number, night?: number } }} options
+   *   layout() works in scene units: y 0 (bottom) … 1 (top), x 0 … width / height. A house size of 0 (or
+   *   props: false, for the lone tree) leaves those out.
    */
-  constructor(canvas, { layout, state }) {
+  constructor(canvas, { palette = 'sunrise', layout, state }) {
     const gl = canvas.getContext('webgl', {
       alpha: false,
       antialias: false,
@@ -548,6 +592,7 @@ export class LandscapeRenderer {
     this.gl = gl
     this.layout = layout
     this.state = state
+    this.pal = PALETTES[palette] ?? PALETTES.sunrise
     this.quality = window.devicePixelRatio > 1 ? 0.5 : 0.75
     // 2 = rays + cloud shadows + mist, 1 = mist only, 0 = bare landscape (slow devices)
     this.fxLevel = 2
@@ -616,8 +661,8 @@ export class LandscapeRenderer {
 
     const L = this.layout(this.w, this.h)
     const day = Math.min(1, Math.max(0, state.day))
-    for (const k in PAL) {
-      const [a, b] = PAL[k]
+    for (const k in this.pal) {
+      const [a, b] = this.pal[k]
       gl.uniform3f(u[k], a[0] + (b[0] - a[0]) * day, a[1] + (b[1] - a[1]) * day, a[2] + (b[2] - a[2]) * day)
     }
     const fx = this.fxLevel
@@ -626,10 +671,11 @@ export class LandscapeRenderer {
     gl.uniform1f(u.uRise, state.rise)
     gl.uniform1f(u.uMist, state.mist)
     gl.uniform1f(u.uCam, state.cam)
+    gl.uniform1f(u.uNight, state.night ?? 0)
     gl.uniform2f(u.uMouse, mouse.x, -mouse.y)
     gl.uniform4f(u.uSun, ...L.sun)
     gl.uniform4f(u.uFrame, L.horizon, L.scale, ...L.house)
-    gl.uniform4f(u.uFx, fx > 1 ? 1 : 0, fx > 1 ? 1 : 0, fx > 0 ? 1 : 0, 0)
+    gl.uniform4f(u.uFx, fx > 1 ? 1 : 0, fx > 1 ? 1 : 0, fx > 0 ? 1 : 0, L.props === false ? 0 : 1)
     gl.drawArrays(gl.TRIANGLES, 0, 3)
   }
 

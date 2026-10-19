@@ -3,14 +3,31 @@ import { gsap, useGSAP, prefersReducedMotion, hasFinePointer } from '../lib/gsap
 import { BRAND, CONTACT, LOCATION, SOCIAL, CREDENTIALS } from '../config'
 import { sunTimes, formatSpan } from '../lib/sun'
 import { whatsappLink } from '../lib/leads'
-import SunCanvas from './SunCanvas'
+import Landscape from './Landscape'
 import { useNow } from './SunReadout'
 import { NAV_LINKS } from './Nav'
 import { SunMark } from './ui/Icons'
 import './Footer.css'
 
-// Low, centred sun that sinks behind the wordmark as you reach the bottom
-const setLayout = (w, h) => ({ x: w * 0.5, y: h * 0.56, r: Math.min(w * 0.19, h * 0.34) })
+// A big, low sun that sets behind the mountains (and the wordmark) as you reach the bottom.
+// Scene units: y 0 (bottom) … 1 (top), x 0 … width / height.
+const setLayout = (w, h) => {
+  const aspect = w / h
+  const narrow = aspect < 1.2
+  return {
+    horizon: narrow ? 0.4 : 0.42,
+    scale: narrow ? 0.62 : 0.8,
+    sun: [aspect * 0.5, 0.84, Math.min(aspect * 0.11, 0.17), 0.55],
+    house: [0, 0],
+    props: false,
+  }
+}
+
+const BIRDS = [
+  { x: 0, y: 0, s: 18 },
+  { x: -2.6, y: 1.8, s: 14 },
+  { x: -4.6, y: -1.2, s: 16 },
+]
 
 const hm = new Intl.DateTimeFormat('en-GB', {
   timeZone: LOCATION.timeZone,
@@ -23,23 +40,27 @@ const SERVICES = ['Rooftop solar', 'Water heaters', 'Street lights', 'Solar pump
 
 export default function Footer() {
   const root = useRef(null)
-  const sun = useRef({ rise: 1, lift: 0.25, scale: 1, heat: 1 }).current
+  const scene = useRef({ rise: 1, day: 0, mist: 0.85, cam: 0, night: 0 }).current
   const now = useNow(60000)
   const today = sunTimes(now, LOCATION.lat, LOCATION.lon, LOCATION.tzOffsetMin)
 
   useGSAP(
     (context, contextSafe) => {
       const q = gsap.utils.selector(root)
-      if (prefersReducedMotion()) return
-      gsap.fromTo(
-        sun,
-        { lift: 0.3 },
-        {
-          lift: -0.36,
-          ease: 'none',
-          scrollTrigger: { trigger: q('.foot__horizon')[0], start: 'top bottom', end: 'bottom bottom', scrub: true },
-        },
-      )
+      if (prefersReducedMotion()) {
+        Object.assign(scene, { rise: 0.45, day: 0.85, night: 0.6 })
+        return
+      }
+      // Sunset as you reach the bottom: the sun sinks behind the peaks, the light climbs off the valleys,
+      // the sky cools to dusk and the first stars come out
+      gsap
+        .timeline({
+          defaults: { ease: 'none' },
+          scrollTrigger: { trigger: q('.foot__horizon')[0], start: 'top bottom', end: 'bottom bottom', scrub: 0.6 },
+        })
+        .to(scene, { rise: 0.45, duration: 1 }, 0)
+        .to(scene, { day: 1, duration: 0.9 }, 0.1)
+        .to(scene, { night: 1, duration: 0.5 }, 0.5)
       // The wordmark rises letter by letter, like a wave
       gsap.from(q('.foot__word span'), {
         yPercent: 70,
@@ -155,7 +176,16 @@ export default function Footer() {
       </div>
 
       <div className="foot__horizon">
-        <SunCanvas className="foot__sun" variant="set" layout={setLayout} state={sun} />
+        <Landscape className="foot__sun" palette="sunset" layout={setLayout} state={scene} />
+        <div className="foot__birds" aria-hidden="true">
+          {BIRDS.map((b, i) => (
+            <span key={i} className="bird" style={{ '--x': `${b.x}vw`, '--y': `${b.y}vh`, '--s': `${b.s}px`, '--i': i }}>
+              <svg viewBox="0 0 24 10">
+                <path d="M1 6 Q6.5 0 12 6 Q17.5 0 23 6" />
+              </svg>
+            </span>
+          ))}
+        </div>
         <p className="foot__today mono">
           Today over {LOCATION.label}: sunrise {hm.format(today.sunrise)} · sunset {hm.format(today.sunset)} ·{' '}
           <b>{formatSpan(today.sunset - today.sunrise)} of free power</b>

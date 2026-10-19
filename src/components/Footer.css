@@ -49,12 +49,16 @@
   overflow: hidden;
 }
 
-.foot__sun { z-index: -1; }
-.sun--set.sun--fallback {
+.foot__sun { z-index: -2; }
+.foot__sun.land--fallback {
   background:
-    radial-gradient(circle at 50% 75%, #ffd9a0 0, #ff7a2e 16%, #c2240c 28%, rgb(194 36 12 / 0.15) 45%, transparent 65%),
-    #0d0c0a;
+    radial-gradient(40% 50% at 50% 70%, #ffd9a0 0, #ff7a2e 22%, rgb(255 106 42 / 0.2) 48%, transparent 70%),
+    linear-gradient(180deg, #151b3d 0%, #5b3d72 45%, #f2864f 70%, #262a4a 71%, #121a1d 100%);
 }
+
+/* A few birds heading home across the sunset */
+.foot__birds { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.foot__birds .bird { top: 20%; color: rgb(13 12 10 / 0.7); animation-duration: 32s; }
 
 .foot__horizon::before {
   content: '';
