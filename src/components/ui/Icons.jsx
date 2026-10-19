@@ -70,6 +70,13 @@ export const Phone = (p) => (
   </svg>
 )
 
+export const MapPin = (p) => (
+  <svg viewBox="0 0 24 24" {...base} {...p}>
+    <path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z" />
+    <circle cx="12" cy="10" r="2.4" />
+  </svg>
+)
+
 export const Mail = (p) => (
   <svg viewBox="0 0 24 24" {...base} {...p}>
     <rect x="3" y="5" width="18" height="14" rx="2" />
@@ -119,6 +126,34 @@ export const IconCare = (p) => (
   <svg viewBox="0 0 48 48" {...base} strokeWidth={1.4} {...p}>
     <path d="M24 4 8 10v12c0 10 7 17.5 16 22 9-4.5 16-12 16-22V10L24 4Z" />
     <path d="m17 24 5 5 9-10" />
+  </svg>
+)
+
+export const IconHeater = (p) => (
+  <svg viewBox="0 0 48 48" {...base} strokeWidth={1.4} {...p}>
+    <rect x="9" y="6" width="32" height="9" rx="4.5" />
+    <path d="M14 15 8 40M20 15l-4 25M26 15l-2 25M32 15l0 25M38 15l2 25" />
+    <path d="M6 40h36M10 40v4M38 40v4" />
+    <path d="M44 9c1.2 1.4 1.2 3.2 0 4.6" />
+  </svg>
+)
+
+export const IconStreetLight = (p) => (
+  <svg viewBox="0 0 48 48" {...base} strokeWidth={1.4} {...p}>
+    <path d="M6 9 22 4l2 6-16 5Z" />
+    <path d="M14 13v31M10 44h8" />
+    <path d="M14 20h18a4 4 0 0 1 4 4" />
+    <path d="M31 24h10l-2 4h-6Z" />
+    <path d="M34 32l-1 3M38 32l1 3M36 32v4" />
+  </svg>
+)
+
+export const IconInverter = (p) => (
+  <svg viewBox="0 0 48 48" {...base} strokeWidth={1.4} {...p}>
+    <rect x="8" y="6" width="32" height="36" rx="3" />
+    <path d="M14 18c2.5-5 5-5 7.5 0s5 5 7.5 0 5-5 5 0" />
+    <path d="M14 30h20M14 35h12" />
+    <circle cx="33" cy="35" r="1.5" />
   </svg>
 )
 

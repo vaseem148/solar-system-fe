@@ -14,8 +14,8 @@ const STEPS = [
   },
   {
     time: 'Day 2 – 3',
-    title: 'Design & fixed quote',
-    text: 'Shadow analysis, panel layout and one all-inclusive price. What we quote is what you pay.',
+    title: 'Proposal & quote',
+    text: 'After the survey you get a clear proposal — panel layout, components and one all-inclusive price.',
     Icon: IconDesign,
   },
   {
@@ -124,7 +124,7 @@ export default function Process() {
       <div className="proc__pin">
         <div className="proc__track">
           <div className="proc__intro">
-            <Label index="05">How we work</Label>
+            <Label index="06">How we work</Label>
             <h2 className="title" data-reveal="lines">
               From first call
               <br /> to <em>first unit.</em>

@@ -5,19 +5,37 @@
 // ─────────────────────────────────────────────────────────────
 
 export const BRAND = {
-  name: 'Solar',
-  legalName: 'Solar Energy',
+  name: 'Suryan',
+  legalName: 'Suryan Energy Systems',
+  tagline: 'Use solar energy, save green earth.',
+  since: 2010,
+  proprietor: 'Mr. V. Gopi',
 }
 
+const PHONES = ['+91 99405 68700', '+91 98840 50218']
+const ADDRESS = '11, Elango Street, J.B. Nagar, Thirumullaivoyal, Chennai 600 062'
+
 export const CONTACT = {
-  phoneDisplay: '+91 98765 43210',
-  phoneHref: 'tel:+919876543210',
-  // Country code + number, digits only (used for wa.me links)
-  whatsapp: '919876543210',
-  email: 'hello@solar.in',
-  region: 'Serving all of Tamil Nadu',
-  // Opening hours in IST: days are 0 = Sunday … 6 = Saturday
-  hours: { label: 'Mon – Sat · 9 am – 7 pm', days: [1, 2, 3, 4, 5, 6], open: 9, close: 19 },
+  phones: PHONES.map((display) => ({ display, href: `tel:${display.replace(/\s/g, '')}` })),
+  phoneDisplay: PHONES[0],
+  phoneHref: `tel:${PHONES[0].replace(/\s/g, '')}`,
+  // Country code + number, digits only (used for wa.me links). Confirm this number is on WhatsApp.
+  whatsapp: '919940568700',
+  email: 'sales@suryanenergy.in',
+  emails: ['sales@suryanenergy.in', 'suryanenergy@yahoo.com'],
+  address: ADDRESS,
+  landmark: 'Murugappa Polytechnic',
+  mapHref: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`Suryan Energy Systems, ${ADDRESS}`)}`,
+  region: 'Chennai & across Tamil Nadu',
+  payments: 'Cash · Cheque',
+  // Opening hours in IST: days are 0 = Sunday … 6 = Saturday; open/close in hours (8.5 = 8:30)
+  hours: { label: 'Mon – Sat · 8:30 am – 7:30 pm', days: [1, 2, 3, 4, 5, 6], open: 8.5, close: 19.5 },
+}
+
+// Registrations shown in the About section and the footer
+export const CREDENTIALS = {
+  msme: 'TN02A035099',
+  gst: '33ATVPG6807H1ZF',
 }
 
 // Optional: when the backend (sw_be) is ready, put its base URL here and
@@ -33,9 +51,9 @@ export const SOCIAL = [
 
 // Used for the live sun readout in the hero and footer.
 export const LOCATION = {
-  label: 'Tamil Nadu',
-  lat: 11.1271,
-  lon: 78.6569,
+  label: 'Chennai',
+  lat: 13.1307,
+  lon: 80.1312,
   timeZone: 'Asia/Kolkata',
   tzOffsetMin: 330,
 }

@@ -6,11 +6,26 @@ import { submitLead, validateLead, whatsappLink, isOpenNow } from '../lib/leads'
 import { useNow } from './SunReadout'
 import Label from './ui/Label'
 import Button from './ui/Button'
-import { Phone, Mail, WhatsApp, Check } from './ui/Icons'
+import { Phone, Mail, MapPin, WhatsApp, Check } from './ui/Icons'
 import './Contact.css'
 
 const PROPERTIES = ['Home', 'Business', 'Farm', 'Other']
 const EMPTY = { name: '', phone: '', area: '', property: 'Home', bill: '', message: '' }
+
+// What happens after the form — kept in step with the Process section's timeline
+const NEXT = [
+  { when: 'Now', title: 'You send this', text: 'Your details open in WhatsApp, ready to send. It takes about a minute.' },
+  {
+    when: 'Within 1 working day',
+    title: 'An engineer calls',
+    text: 'Not a call centre — someone who can answer real questions about your roof and your bill.',
+  },
+  {
+    when: 'At a time that suits you',
+    title: 'Free site visit',
+    text: 'Roof, shade and wiring checked in person. A fixed, all-inclusive quote follows in 2–3 days.',
+  },
+]
 
 function Field({ id, label, error, prefix, children }) {
   return (
@@ -38,11 +53,29 @@ export default function Contact() {
   const now = useNow(60000)
   const open = isOpenNow(now)
 
-  // "on." switches on like a light when the section arrives: a flicker, then a warm glow
   useGSAP(
     () => {
+      const steps = gsap.utils.toArray('.nextstep', root.current)
+      if (prefersReducedMotion()) {
+        steps.forEach((step) => step.classList.add('is-lit'))
+        return
+      }
+
+      // Next steps: each node lights, its words rise, then the line runs on to the next one
+      const list = root.current.querySelector('.nextsteps')
+      const next = gsap.timeline({ scrollTrigger: { trigger: list, start: 'top 82%', once: true } })
+      steps.forEach((step, i) => {
+        const at = i * 0.62
+        next
+          .call(() => step.classList.add('is-lit'), null, at)
+          .from(step.querySelectorAll('.nextstep__body > *'), { y: 18, opacity: 0, duration: 0.9, stagger: 0.07, ease: 'expo.out' }, at)
+        const fill = step.querySelector('.nextstep__fill')
+        if (fill) next.fromTo(fill, { '--p': 0 }, { '--p': 1, duration: 0.55, ease: 'power2.inOut' }, at + 0.12)
+      })
+
+      // "on." switches on like a light when the section arrives: a flicker, then a warm glow
       const word = root.current.querySelector('.contact__title em')
-      if (!word || prefersReducedMotion()) return
+      if (!word) return
       gsap
         .timeline({ delay: 0.9, scrollTrigger: { trigger: root.current, start: 'top 65%', once: true } })
         .to(word, {
@@ -170,7 +203,7 @@ export default function Contact() {
     <section ref={root} id="contact" className="contact section" data-tone="dark">
       <div className="container contact__grid">
         <div className="contact__intro">
-          <Label index="09">Free site visit</Label>
+          <Label index="10">Free site visit</Label>
           <h2 className="contact__title title" data-reveal="lines">
             Let’s switch
             <br /> your roof <em>on.</em>
@@ -181,11 +214,13 @@ export default function Contact() {
           </p>
 
           <ul className="contact__direct" data-reveal="up">
-            <li>
-              <a href={CONTACT.phoneHref}>
-                <span className="contact__ico contact__ico--phone"><Phone /></span> <span className="ulink">{CONTACT.phoneDisplay}</span>
-              </a>
-            </li>
+            {CONTACT.phones.map((p) => (
+              <li key={p.href}>
+                <a href={p.href}>
+                  <span className="contact__ico contact__ico--phone"><Phone /></span> <span className="ulink">{p.display}</span>
+                </a>
+              </li>
+            ))}
             <li>
               <a href={whatsappLink()} target="_blank" rel="noopener noreferrer">
                 <span className="contact__ico contact__ico--wa"><WhatsApp /></span> <span className="ulink">WhatsApp us</span>
@@ -198,9 +233,18 @@ export default function Contact() {
             </li>
           </ul>
 
+          <a className="contact__address" href={CONTACT.mapHref} target="_blank" rel="noopener noreferrer" data-reveal="up">
+            <span className="contact__ico contact__ico--pin"><MapPin /></span>
+            <span>
+              <span className="ulink">{CONTACT.address}</span>
+              <small className="mono">Near {CONTACT.landmark}</small>
+              <small className="mono contact__map">Open in Google Maps ↗</small>
+            </span>
+          </a>
+
           <p className={`contact__status mono ${open ? 'is-open' : ''}`} data-reveal="up">
             <i aria-hidden="true" />
-            {open ? 'Open now · usually replies within minutes' : 'Closed right now · we’ll call you first thing'}
+            {open ? 'Open now · call or WhatsApp us' : 'Closed right now · we’ll call you first thing'}
             <span>{CONTACT.hours.label}</span>
           </p>
         </div>
@@ -316,6 +360,31 @@ export default function Contact() {
               <p className="form__fine mono">No spam, no sales calls at dinner time. Promise.</p>
             </form>
           )}
+        </div>
+      </div>
+
+      <div className="container">
+        <div className="nextsteps">
+          <p className="nextsteps__label mono">What happens next</p>
+          <ol className="nextsteps__list">
+            {NEXT.map((s, i) => (
+              <li className="nextstep" key={s.title}>
+                <span className="nextstep__node" aria-hidden="true" />
+                {i < NEXT.length - 1 && (
+                  <span className="nextstep__line" aria-hidden="true">
+                    <i className="nextstep__fill" />
+                  </span>
+                )}
+                <div className="nextstep__body">
+                  <p className="nextstep__when mono">
+                    {String(i + 1).padStart(2, '0')} — {s.when}
+                  </p>
+                  <h3 className="nextstep__title">{s.title}</h3>
+                  <p className="nextstep__text">{s.text}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
       </div>
     </section>

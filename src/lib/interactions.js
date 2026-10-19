@@ -75,9 +75,13 @@ export function scramble(el, { duration = 0.9, delay = 0, chars } = {}) {
     if (!overlay.isConnected) {
       const cs = getComputedStyle(el)
       if (cs.display === 'inline') {
+        overlay.style.display = ''
         overlay.style.width = ''
         overlay.style.whiteSpace = 'pre'
       } else {
+        // A block-level box's static position is the content box's start edge; an inline one would begin
+        // where the first glyph sits, pushing right-aligned text out past the edge.
+        overlay.style.display = 'block'
         // clientWidth is rounded down; +1px so a fractional-width line can't wrap early
         const padX = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight)
         overlay.style.width = `${Math.max(0, el.clientWidth - padX + 1)}px`

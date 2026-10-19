@@ -1,0 +1,188 @@
+/* A long scroll with a sticky stage: scrolling through it plays the sunrise */
+.earth {
+  --ink-earth: #10222e;
+  position: relative;
+  height: 320vh;
+}
+
+/* the page colour melts into the dawn sky as the section arrives (scrolls away before the stage pins) */
+.earth::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 1;
+  height: 24vh;
+  background: linear-gradient(var(--bg), transparent);
+  pointer-events: none;
+}
+
+.earth__stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  min-height: 560px;
+  overflow: hidden;
+  isolation: isolate;
+  color: var(--ink-earth);
+}
+
+.land { position: absolute; inset: 0; }
+.land canvas { width: 100%; height: 100%; }
+.land--fallback {
+  background:
+    radial-gradient(40% 30% at 78% 22%, #fff3d1 0%, rgb(255 240 196 / 0) 70%),
+    linear-gradient(180deg, #74acdc 0%, #b6d8ee 42%, #9db7c9 58%, #4a7a47 72%, #1e3d30 100%);
+}
+.earth__scene { z-index: -2; }
+
+/* ── Copy, in the sky ─────────────────────── */
+.earth__copy {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 18px;
+  height: 100%;
+  padding-top: calc(var(--nav-h) + clamp(12px, 4.5vh, 56px));
+  text-align: center;
+}
+
+.earth__title {
+  font-family: var(--sans);
+  font-stretch: 66%;
+  font-weight: 760;
+  font-size: clamp(2.6rem, min(7.2vw, 11.5vh), 8.4rem);
+  line-height: 0.9;
+  letter-spacing: -0.012em;
+  text-transform: uppercase;
+}
+.earth__line {
+  display: block;
+  overflow: hidden;
+  padding: 0.05em 0.08em 0.09em;
+  margin-bottom: -0.09em;
+}
+.earth__line > span { display: inline-block; transform-origin: 0% 100%; }
+.earth__title em {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.08em;
+  line-height: 0.8;
+  letter-spacing: -0.025em;
+  text-transform: none;
+}
+.earth__solar { color: var(--sun); }
+.earth__green { color: #2c6a37; }
+
+.earth__sub {
+  max-width: 38ch;
+  font-size: clamp(1.02rem, 1.25vw, 1.2rem);
+  line-height: 1.5;
+  color: rgb(16 34 46 / 0.8);
+}
+
+.earth__stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 4px 0 0; }
+.earth__stat {
+  display: grid;
+  gap: 4px;
+  padding: 12px 18px 13px;
+  border-radius: 18px;
+  border: 1px solid rgb(255 255 255 / 0.55);
+  background: rgb(255 255 255 / 0.4);
+  -webkit-backdrop-filter: blur(12px) saturate(1.3);
+  backdrop-filter: blur(12px) saturate(1.3);
+  text-align: left;
+}
+.earth__stat dd {
+  order: -1;
+  margin: 0;
+  font-stretch: 62%;
+  font-weight: 800;
+  font-size: clamp(1.9rem, 2.6vw, 2.7rem);
+  line-height: 0.95;
+}
+.earth__stat dt {
+  max-width: 21ch;
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(16 34 46 / 0.72);
+}
+.earth__link {
+  margin-top: 4px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.5);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: var(--ink-earth);
+  transition: background-color 0.4s;
+}
+.earth__link:hover { background: rgb(255 255 255 / 0.75); }
+
+/* Corner clock, like a timestamp on a photograph */
+.earth__clock {
+  position: absolute;
+  left: var(--gutter);
+  bottom: clamp(16px, 3vh, 28px);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: rgb(255 255 255 / 0.9);
+  text-shadow: 0 1px 10px rgb(0 0 0 / 0.35);
+}
+.earth__clock i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sun);
+  box-shadow: 0 0 10px var(--sun);
+}
+
+/* ── Birds ─────────────────────────────────── */
+.earth__birds { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.bird {
+  position: absolute;
+  left: 0;
+  top: 11%;
+  width: var(--s);
+  color: rgb(16 34 46 / 0.6);
+  animation: bird-fly 26s linear infinite;
+  animation-delay: calc(var(--i) * -0.35s - 6s);
+}
+.bird svg { display: block; width: 100%; overflow: visible; }
+.bird path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transform-origin: 50% 60%;
+  animation: bird-flap 0.85s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -0.17s);
+}
+@keyframes bird-fly {
+  from { transform: translate3d(calc(-14vw + var(--x)), var(--y), 0); }
+  to { transform: translate3d(calc(112vw + var(--x)), calc(var(--y) - 9vh), 0); }
+}
+@keyframes bird-flap {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(-0.55); }
+}
+.earth:not(.is-live) .bird,
+.earth:not(.is-live) .bird path { animation-play-state: paused; }
+
+@media (max-width: 760px) {
+  .earth { height: 280vh; }
+  .earth__copy { gap: 14px; }
+  .earth__title { font-size: clamp(2.4rem, 12vw, 4rem); }
+  .earth__stat { padding: 10px 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .earth { height: auto; }
+  .earth__stage { position: relative; }
+  .bird { display: none; }
+}

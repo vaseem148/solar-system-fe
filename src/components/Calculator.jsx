@@ -267,7 +267,7 @@ export default function Calculator() {
     <section ref={root} id="calculator" className="calc section" data-tone="dark">
       <div className="container">
         <header className="calc__head">
-          <Label index="04">Savings calculator</Label>
+          <Label index="05">Savings calculator</Label>
           <h2 className="title" data-reveal="lines">
             What’s your roof
             <br /> really <em>worth?</em>

@@ -35,7 +35,8 @@
   display: grid;
   grid-template-rows: auto 1fr auto;
   padding-top: calc(var(--nav-h) + clamp(10px, 2.6vh, 28px));
-  padding-bottom: clamp(28px, 5.5vh, 60px);
+  /* room for the crossed marquee tapes that overlap the bottom of the hero */
+  padding-bottom: calc(clamp(24px, 4vh, 48px) + clamp(64px, 8.5vw, 124px));
 }
 
 /* ── Meta row ──────────────────────────────── */
@@ -67,7 +68,12 @@
   100% { box-shadow: 0 0 0 0 rgb(255 90 31 / 0); }
 }
 
-/* Live readout */
+/* Live readout — pinned top-right so it never pushes the headline down */
+.hero__readout {
+  position: absolute;
+  top: calc(var(--nav-h) + clamp(10px, 2.6vh, 28px));
+  right: var(--gutter);
+}
 .readout {
   display: grid;
   gap: 5px;
@@ -106,11 +112,10 @@
 /* ── Headline ──────────────────────────────── */
 .hero__title {
   align-self: center;
-  margin-top: 1vh;
   font-family: var(--sans);
   font-stretch: 62%;
   font-weight: 800;
-  font-size: clamp(3.7rem, min(10.6vw, 17.6vh), 13rem);
+  font-size: clamp(3.4rem, min(10.6vw, 15.5vh), 13rem);
   line-height: 0.84;
   letter-spacing: -0.012em;
   text-transform: uppercase;
@@ -151,12 +156,12 @@
 .hero__foot {
   display: grid;
   justify-items: start;
-  gap: 26px;
-  max-width: 560px;
+  gap: 22px;
+  max-width: 600px;
 }
 
 .hero__lede {
-  max-width: 44ch;
+  max-width: 50ch;
   font-size: clamp(1rem, 1.12vw, 1.12rem);
   line-height: 1.55;
   color: var(--muted);
@@ -171,15 +176,63 @@
   backdrop-filter: blur(10px);
 }
 
+/* Live chip — small screens' stand-in for the readout, sitting on the sunrise */
+.hero__chip { display: none; }
+.sunchip {
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 9px 15px 9px 12px;
+  border-radius: 999px;
+  border: 1px solid rgb(242 237 228 / 0.16);
+  background: rgb(13 12 10 / 0.64);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+  backdrop-filter: blur(12px) saturate(1.4);
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--bone);
+}
+.sunchip i {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 10px var(--gold);
+}
+.sunchip--night i { background: var(--muted); box-shadow: none; }
+
 @media (max-width: 860px) {
   .hero__readout { display: none; }
   .hero__line--indent { padding-left: 0.9em; }
 }
 
+/* Portrait (phones, tablets): the copy stacks at the top and the sun rises in the space below it */
+@media (max-aspect-ratio: 9/10) {
+  .hero__inner { grid-template-rows: auto auto auto 1fr; }
+  .hero__title { align-self: start; margin-top: clamp(28px, 6vh, 80px); }
+  .hero__foot { margin-top: clamp(22px, 3.4vh, 40px); }
+  .hero__shade {
+    background: linear-gradient(180deg, rgb(13 12 10 / 0.62) 0%, rgb(13 12 10 / 0.3) 42%, transparent 64%);
+  }
+}
+
+@media (max-width: 860px) and (max-aspect-ratio: 9/10) {
+  .hero__chip {
+    display: inline-flex;
+    position: absolute;
+    left: var(--gutter);
+    bottom: calc(clamp(36px, 5vw, 70px) + 22px);
+    max-width: calc(100% - 2 * var(--gutter));
+  }
+}
+
 @media (max-width: 560px) {
-  .hero__shade { background: linear-gradient(0deg, rgb(13 12 10 / 0.55) 0%, transparent 38%), linear-gradient(180deg, rgb(13 12 10 / 0.6) 0%, transparent 26%); }
-  .hero__title { font-size: clamp(3.3rem, 16.5vw, 5rem); align-self: start; margin-top: 7vh; }
-  .hero__foot { gap: 22px; }
+  .hero__title { font-size: clamp(3.3rem, 16.5vw, 5rem); }
   .hero__ctas { width: 100%; }
   .hero__ctas .btn { flex: 1 1 100%; justify-content: space-between; }
 }

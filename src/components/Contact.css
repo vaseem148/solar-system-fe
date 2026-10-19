@@ -40,6 +40,25 @@
   65% { transform: translateY(1px) scaleY(1.06); }
 }
 
+.contact__address {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 14px;
+  max-width: 34ch;
+  line-height: 1.45;
+}
+.contact__address .contact__ico { flex: none; }
+.contact__address svg { width: 22px; height: 22px; margin-top: 1px; color: var(--sun); }
+.contact__address > span:last-child { display: grid; gap: 6px; }
+.contact__address small { color: var(--muted); }
+.contact__address .contact__map { color: var(--sun); }
+.contact__address:hover .contact__ico--pin { animation: ico-drop 0.7s var(--ease); }
+@keyframes ico-drop {
+  0%, 100% { transform: translateY(0); }
+  35% { transform: translateY(-6px); }
+  60% { transform: translateY(1px) scaleY(0.9); }
+}
+
 .contact__status {
   display: flex;
   flex-wrap: wrap;
@@ -221,8 +240,93 @@
   to { transform: scale(1) rotate(0); }
 }
 
+/* What happens next — three nodes on a line that runs on as each one lights */
+.nextsteps { margin-top: clamp(72px, 9vw, 140px); }
+.nextsteps__label { color: var(--muted); margin-bottom: clamp(22px, 2.4vw, 34px); }
+
+.nextsteps__list {
+  --gap: clamp(28px, 3.4vw, 60px);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--gap);
+}
+
+.nextstep { position: relative; padding-top: 38px; }
+
+.nextstep__node {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1.5px solid var(--line);
+  transition: background-color 0.5s, border-color 0.5s, box-shadow 0.5s, transform 0.6s var(--ease);
+}
+.nextstep.is-lit .nextstep__node {
+  background: var(--sun);
+  border-color: var(--sun);
+  transform: scale(1.15);
+  box-shadow: 0 0 0 5px rgb(255 90 31 / 0.16), 0 0 18px rgb(255 90 31 / 0.7);
+}
+/* the last step is the one we want booked — it keeps breathing */
+.nextstep:last-child.is-lit .nextstep__node { animation: next-pulse 2.4s 1s infinite; }
+@keyframes next-pulse {
+  0% { box-shadow: 0 0 0 0 rgb(255 90 31 / 0.55), 0 0 18px rgb(255 90 31 / 0.7); }
+  70% { box-shadow: 0 0 0 12px rgb(255 90 31 / 0), 0 0 18px rgb(255 90 31 / 0.7); }
+  100% { box-shadow: 0 0 0 0 rgb(255 90 31 / 0), 0 0 18px rgb(255 90 31 / 0.7); }
+}
+
+/* from just after this node to just before the next column's node */
+.nextstep__line {
+  position: absolute;
+  top: 6px;
+  left: 23px;
+  right: calc(10px - var(--gap));
+  height: 1px;
+  background: var(--line);
+}
+.nextstep__fill {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--sun), var(--gold));
+  transform-origin: 0 50%;
+  transform: scaleX(var(--p, 1));
+}
+
+.nextstep__body { display: grid; gap: 12px; justify-items: start; }
+.nextstep__when { color: var(--sun); }
+.nextstep__title {
+  font-stretch: 70%;
+  font-weight: 740;
+  font-size: clamp(1.5rem, 2vw, 2.1rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+.nextstep__text { max-width: 34ch; color: var(--muted); line-height: 1.55; }
+
 @media (max-width: 980px) {
   .contact__grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 760px) {
+  .nextsteps__list { grid-template-columns: 1fr; }
+  .nextstep { padding: 0 0 0 38px; }
+  .nextstep__node { top: 3px; }
+  .nextstep__line {
+    top: 26px;
+    bottom: calc(6px - var(--gap));
+    left: 6px;
+    right: auto;
+    width: 1px;
+    height: auto;
+  }
+  .nextstep__fill {
+    background: linear-gradient(180deg, var(--sun), var(--gold));
+    transform-origin: 50% 0;
+    transform: scaleY(var(--p, 1));
+  }
 }
 @media (max-width: 560px) {
   .form__row { grid-template-columns: 1fr; }

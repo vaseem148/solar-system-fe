@@ -10,6 +10,7 @@ import './Nav.css'
 export const NAV_LINKS = [
   { href: '#how', label: 'How it works' },
   { href: '#services', label: 'Services' },
+  { href: '#about', label: 'About' },
   { href: '#calculator', label: 'Savings' },
   { href: '#process', label: 'Process' },
   { href: '#faq', label: 'FAQ' },

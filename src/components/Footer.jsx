@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { gsap, useGSAP, prefersReducedMotion, hasFinePointer } from '../lib/gsap'
-import { BRAND, CONTACT, LOCATION, SOCIAL } from '../config'
+import { BRAND, CONTACT, LOCATION, SOCIAL, CREDENTIALS } from '../config'
 import { sunTimes, formatSpan } from '../lib/sun'
 import { whatsappLink } from '../lib/leads'
 import SunCanvas from './SunCanvas'
@@ -19,7 +19,7 @@ const hm = new Intl.DateTimeFormat('en-GB', {
   hourCycle: 'h23',
 })
 
-const SERVICES = ['Homes', 'Business', 'Farms', 'Backup', 'Care']
+const SERVICES = ['Rooftop solar', 'Water heaters', 'Street lights', 'Solar pumps', 'Inverters', 'Maintenance']
 
 export default function Footer() {
   const root = useRef(null)
@@ -97,7 +97,9 @@ export default function Footer() {
             <SunMark />
             {BRAND.name}
           </a>
-          <p className="foot__tagline">Rooftop solar for Tamil Nadu homes, farms and factories.</p>
+          <p className="foot__tagline">
+            {BRAND.tagline} Solar plants, water heaters, street lights and pumps — Chennai, since {BRAND.since}.
+          </p>
           <p className="foot__tamil" lang="ta">
             சூரியனிடமிருந்து உங்கள் வீட்டுக்கு.
           </p>
@@ -123,16 +125,22 @@ export default function Footer() {
 
         <div className="foot__col">
           <p className="mono">Talk to us</p>
-          <a href={CONTACT.phoneHref} className="ulink">
-            {CONTACT.phoneDisplay}
-          </a>
+          {CONTACT.phones.map((p) => (
+            <a key={p.href} href={p.href} className="ulink">
+              {p.display}
+            </a>
+          ))}
           <a href={whatsappLink()} target="_blank" rel="noopener noreferrer" className="ulink">
             WhatsApp
           </a>
-          <a href={`mailto:${CONTACT.email}`} className="ulink">
-            {CONTACT.email}
+          {CONTACT.emails.map((e) => (
+            <a key={e} href={`mailto:${e}`} className="ulink">
+              {e}
+            </a>
+          ))}
+          <a href={CONTACT.mapHref} target="_blank" rel="noopener noreferrer" className="foot__addr">
+            {CONTACT.address}
           </a>
-          <span>{CONTACT.region}</span>
           <span>{CONTACT.hours.label}</span>
         </div>
 
@@ -152,7 +160,7 @@ export default function Footer() {
           Today over {LOCATION.label}: sunrise {hm.format(today.sunrise)} · sunset {hm.format(today.sunset)} ·{' '}
           <b>{formatSpan(today.sunset - today.sunrise)} of free power</b>
         </p>
-        <p className="foot__word" aria-hidden="true">
+        <p className="foot__word" aria-hidden="true" style={{ '--chars': BRAND.name.length }}>
           {BRAND.name.split('').map((ch, i) => (
             <span key={i}>{ch}</span>
           ))}
@@ -163,7 +171,9 @@ export default function Footer() {
         <span>
           © {now.getFullYear()} {BRAND.legalName}. All rights reserved.
         </span>
-        <span>Made under the Tamil Nadu sun.</span>
+        <span>
+          MSME UAN {CREDENTIALS.msme} · GSTIN {CREDENTIALS.gst}
+        </span>
         <a href="#top" className="foot__top-link">
           <span className="ulink">Back to top</span>
           <span className="foot__arrow" aria-hidden="true">

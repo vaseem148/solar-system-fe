@@ -32,8 +32,16 @@ const FAQS = [
     a: 'Mostly cleaning — dust is the biggest enemy here. Rinse the panels with plain water every two weeks, early morning or evening. Our AMC plans add scheduled cleaning, health checks and generation monitoring.',
   },
   {
-    q: 'Can I pay in EMIs?',
-    a: 'Yes. We help you apply for low-interest solar loans through banks, and businesses can choose flexible payment plans. In many cases the monthly EMI is smaller than the bill it replaces.',
+    q: 'Do you also do water heaters, street lights and pumps?',
+    a: 'Yes. Evacuated-tube and flat-plate water heaters from 100 to 300 litres a day, LED solar street lights from 7 W to 50 W, solar water pumps, and on-grid and off-grid inverters — supplied, installed and maintained by the same team.',
+  },
+  {
+    q: 'How can I pay?',
+    a: `We accept ${CONTACT.payments.replace(' · ', ' and ').toLowerCase()} payments.`,
+  },
+  {
+    q: 'Where is your office, and when are you open?',
+    a: `${CONTACT.address}, near ${CONTACT.landmark}. We are open ${CONTACT.hours.label.replace(' · ', ', ')}, and closed on Sundays.`,
   },
   {
     q: 'Will installation damage my terrace or cause leaks?',
@@ -99,13 +107,13 @@ export default function Faq() {
     <section ref={root} id="faq" className="faq section" data-tone="light">
       <div className="container faq__grid">
         <header className="faq__head">
-          <Label index="08">FAQ</Label>
+          <Label index="09">FAQ</Label>
           <h2 className="title" data-reveal="lines">
             Questions,
             <br /> <em>answered.</em>
           </h2>
           <p className="lede" data-reveal="up">
-            Still unsure about something? Ask us on WhatsApp — a real engineer replies, usually within the hour.
+            Still unsure about something? Ask us on WhatsApp, or call {CONTACT.phoneDisplay}.
           </p>
           <div data-reveal="up">
             <Button

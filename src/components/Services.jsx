@@ -3,51 +3,60 @@ import { gsap, ScrollTrigger, useGSAP, hasFinePointer, prefersReducedMotion } fr
 import { scramble } from '../lib/interactions'
 import { prefillContact } from '../lib/prefill'
 import Label from './ui/Label'
-import { ArrowUpRight, IconHome, IconFactory, IconFarm, IconBattery, IconCare } from './ui/Icons'
+import { ArrowUpRight, IconHome, IconHeater, IconStreetLight, IconFarm, IconInverter, IconCare } from './ui/Icons'
 import './Services.css'
 
 const SERVICES = [
   {
-    title: 'Homes',
-    kicker: 'Residential rooftop',
-    text: 'On-grid systems sized to your EB bill. We file the PM Surya Ghar subsidy for you, start to finish.',
-    tags: ['1 – 10 kW', 'Up to ₹78,000 subsidy', 'EMI options'],
-    spec: '1–10 kW',
+    title: 'Rooftop',
+    kicker: 'Solar power plants',
+    text: 'On-grid rooftop plants for homes, shops and factories — built with Waaree panels and MNRE-approved components.',
+    tags: ['1 – 100 kW', 'Grid-tie', 'MNRE approved'],
+    spec: '1–100 kW',
     property: 'Home',
     Icon: IconHome,
   },
   {
-    title: 'Business',
-    kicker: 'Commercial & industrial',
-    text: 'Cut daytime power costs for shops, schools, hospitals and factories — with tax benefits on top.',
-    tags: ['10 kW – 1 MW', '3–4 year payback', 'Capex or EMI'],
-    spec: '10 kW–1 MW',
-    property: 'Business',
-    Icon: IconFactory,
+    title: 'Heaters',
+    kicker: 'Solar water heaters',
+    text: 'Evacuated-tube and flat-plate heaters for homes, hostels and hotels — hot water from the morning sun, no geyser bill.',
+    tags: ['100 – 300 LPD', 'ETC & flat plate', '5-year warranty'],
+    spec: '100–300 L',
+    property: 'Home',
+    Icon: IconHeater,
   },
   {
-    title: 'Farms',
+    title: 'Lights',
+    kicker: 'Solar street lights',
+    text: 'All-in-one LED street lights for roads, layouts, campuses and factories — plus solar home-lighting kits for shops and huts.',
+    tags: ['7 – 50 W LED', 'IP65', 'Lithium battery'],
+    spec: '7–50 W',
+    property: 'Business',
+    Icon: IconStreetLight,
+  },
+  {
+    title: 'Pumps',
     kicker: 'Solar water pumps',
-    text: 'Daytime irrigation without diesel bills or waiting for three-phase supply. Surface and submersible pumps.',
-    tags: ['3 – 10 HP', 'Zero fuel cost', 'PM-KUSUM eligible'],
-    spec: '3–10 HP',
+    text: 'Daytime irrigation that runs on sunlight — no diesel bills, no waiting for three-phase supply.',
+    tags: ['Agricultural', 'Automatic', 'Zero fuel cost'],
+    spec: 'Farms',
     property: 'Farm',
     Icon: IconFarm,
   },
   {
-    title: 'Backup',
-    kicker: 'Hybrid + battery',
-    text: 'Power cut in your street? Hybrid inverters with lithium batteries keep fans, lights and Wi-Fi running.',
-    tags: ['5 – 20 kWh', 'Lithium LFP', 'Auto switch-over'],
-    spec: '5–20 kWh',
+    title: 'Inverters',
+    kicker: 'On-grid & off-grid',
+    text: 'Grid-tie inverters for rooftop plants, and pure-sine-wave off-grid inverters with batteries to ride through power cuts.',
+    tags: ['On-grid', 'Off-grid', 'Pure sine wave'],
+    spec: 'Backup',
     property: 'Home',
-    Icon: IconBattery,
+    Icon: IconInverter,
   },
   {
     title: 'Care',
     kicker: 'Maintenance & AMC',
-    text: 'Cleaning, health checks and monitoring, so output never quietly drops. Any brand, even if we didn’t install it.',
-    tags: ['Quarterly visits', 'App monitoring', 'Any brand'],
+    text: 'Preventive maintenance, cleaning and repairs for solar plants and water heaters — by our own skilled team.',
+    tags: ['Preventive', 'Repairs', 'AMC'],
     spec: '365 days',
     property: 'Other',
     Icon: IconCare,
@@ -181,7 +190,8 @@ export default function Services() {
             <br /> kind of <em>roof.</em>
           </h2>
           <p className="lede" data-reveal="up">
-            Homes, shops, farms and factories — one engineering team designs, installs and services all of it.
+            Power plants, water heaters, street lights, pumps and inverters — one Chennai team supplies, installs and
+            services all of it.
           </p>
         </header>
 

@@ -17,21 +17,21 @@ const STATS = [
 // The sun's daily path drawn behind the paragraph: 06:00 on the left, noon at the top, 18:00 on the right
 const ARC = { cx: 800, cy: 720, rx: 700, ry: 640 }
 const ARC_D = `M${ARC.cx - ARC.rx} ${ARC.cy} A${ARC.rx} ${ARC.ry} 0 0 1 ${ARC.cx + ARC.rx} ${ARC.cy}`
+// Every two hours gets a tick, but only sunrise, noon and sunset are labelled — the others would land on
+// the paragraph. Noon's label sits above the arc; sunrise and sunset sit just inside its feet, clear of the
+// stats' rules below.
 const HOURS = [6, 8, 10, 12, 14, 16, 18].map((h) => {
   const t = Math.PI * (1 - (h - 6) / 12)
   const x = ARC.cx + ARC.rx * Math.cos(t)
   const y = ARC.cy - ARC.ry * Math.sin(t)
   const nx = Math.cos(t)
   const ny = -Math.sin(t)
-  return {
-    h,
-    x1: x + nx * 10,
-    y1: y + ny * 10,
-    x2: x + nx * 28,
-    y2: y + ny * 28,
-    lx: x + nx * 56,
-    ly: y + ny * 56 + 6,
-  }
+  const label = {
+    6: { x: x + 24, y: y - 18, anchor: 'start' },
+    12: { x, y: y - 50, anchor: 'middle' },
+    18: { x: x - 24, y: y - 18, anchor: 'end' },
+  }[h]
+  return { h, x1: x + nx * 10, y1: y + ny * 10, x2: x + nx * 28, y2: y + ny * 28, label }
 })
 
 // What each word settles to once lit
@@ -127,9 +127,11 @@ export default function Manifesto() {
             {HOURS.map((t) => (
               <g key={t.h} className="sunpath__tick">
                 <line x1={t.x1} y1={t.y1} x2={t.x2} y2={t.y2} />
-                <text x={t.lx} y={t.ly} textAnchor="middle">
-                  {String(t.h).padStart(2, '0')}:00
-                </text>
+                {t.label && (
+                  <text x={t.label.x} y={t.label.y} textAnchor={t.label.anchor}>
+                    {String(t.h).padStart(2, '0')}:00
+                  </text>
+                )}
               </g>
             ))}
             <g className="sunpath__sun">

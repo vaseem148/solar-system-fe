@@ -6,15 +6,15 @@ import './Marquee.css'
 
 const FRONT = [
   'Rooftop solar',
-  'PM Surya Ghar subsidy',
-  'Net metering',
+  'Solar water heaters',
+  'Street lights',
   'Solar pumps',
-  'Hybrid + battery',
-  '25-year warranty',
+  'PM Surya Ghar subsidy',
+  'Since 2010',
   'Free site survey',
 ]
 
-const BACK = ['சூரிய சக்தி', 'Zero EB bill', 'Made for Tamil Nadu', 'Engineer-led', 'சூரிய சக்தி', 'Fixed quote', 'Any roof']
+const BACK = ['சூரியன்', 'Zero EB bill', 'Chennai since 2010', 'Hot water from the sun', 'சூரிய சக்தி', 'MSME registered', 'Any roof']
 
 /** Two crossed tapes that run with your scroll — faster when you scroll faster, opposite ways. */
 export default function Marquee() {

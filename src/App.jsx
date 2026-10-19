@@ -10,6 +10,8 @@ import Marquee from './components/Marquee'
 import Manifesto from './components/Manifesto'
 import HowItWorks from './components/HowItWorks'
 import Services from './components/Services'
+import About from './components/About'
+import Earth from './components/Earth'
 import Calculator from './components/Calculator'
 import Process from './components/Process'
 import Sizes from './components/Sizes'
@@ -155,6 +157,8 @@ export default function App() {
         <Manifesto />
         <HowItWorks />
         <Services />
+        <Earth />
+        <About />
         <Calculator />
         <Process />
         <Sizes />

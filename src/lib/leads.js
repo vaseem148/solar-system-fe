@@ -19,7 +19,7 @@ export function validateLead(data) {
 
 export function leadMessage(data) {
   return [
-    `Hi ${BRAND.name}! I'd like a free solar site visit.`,
+    `Hi ${BRAND.legalName}! I'd like a free solar site visit.`,
     '',
     `Name: ${data.name.trim()}`,
     `Mobile: ${normalisePhone(data.phone)}`,
@@ -55,13 +55,15 @@ const dayHour = new Intl.DateTimeFormat('en-GB', {
   timeZone: LOCATION.timeZone,
   weekday: 'short',
   hour: 'numeric',
+  minute: 'numeric',
   hourCycle: 'h23',
 })
 
 export function isOpenNow(now = new Date()) {
   const parts = dayHour.formatToParts(now)
-  const day = DAYS.indexOf(parts.find((p) => p.type === 'weekday')?.value)
-  const hour = Number(parts.find((p) => p.type === 'hour')?.value)
+  const part = (type) => parts.find((p) => p.type === type)?.value
+  const day = DAYS.indexOf(part('weekday'))
+  const hour = Number(part('hour')) + Number(part('minute')) / 60
   const { days, open, close } = CONTACT.hours
   return days.includes(day) && hour >= open && hour < close
 }

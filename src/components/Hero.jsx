@@ -1,16 +1,25 @@
 import { useEffect, useRef } from 'react'
 import { gsap, useGSAP, prefersReducedMotion, hasFinePointer } from '../lib/gsap'
 import { scramble } from '../lib/interactions'
-import { LOCATION } from '../config'
+import { BRAND, LOCATION } from '../config'
 import SunCanvas from './SunCanvas'
-import SunReadout from './SunReadout'
+import SunReadout, { SunChip } from './SunReadout'
 import Button from './ui/Button'
 import { ArrowDown } from './ui/Icons'
 import './Hero.css'
 
-// Sun rests low on the right on wide screens, low and wide on phones.
-const heroLayout = (w, h) =>
-  w >= h * 0.9 ? { x: w * 0.72, y: h * 1.11, r: h * 0.5 } : { x: w * 0.62, y: h + w * 0.26, r: w * 0.74 }
+// Where the copy ends (px from the hero's top). The renderer calls the layout every frame, so it reads this
+// measurement (refreshed on resize) rather than touching the DOM.
+const stage = { copyBottom: 0 }
+
+// Wide screens: the sun rests low on the right. Portrait: the copy stacks at the top and the sun rises
+// as a wide arc in the space beneath it.
+const heroLayout = (w, h) => {
+  if (w >= h * 0.9) return { x: w * 0.72, y: h * 1.11, r: h * 0.5 }
+  const r = w * 0.62
+  const top = Math.min(Math.max(stage.copyBottom + w * 0.08, h * 0.5), h * 0.86)
+  return { x: w * 0.6, y: top + r, r }
+}
 
 /** Splits a word group into animatable characters (spaces stay real text). */
 const Chars = ({ text }) =>
@@ -33,6 +42,23 @@ export default function Hero({ ready }) {
   const sun = useRef({ rise: 0, lift: 0, scale: 1, heat: 0.55, glow: 0 }).current
   const intro = useRef(null)
 
+  // Keep the portrait sun just below the copy, whatever the fonts and screen do to its height
+  useEffect(() => {
+    const ctas = root.current.querySelector('.hero__ctas')
+    const measure = () => {
+      // Layout offsets (transforms ignored) summed up to the hero; GSAP's transforms make ancestors offsetParents
+      let y = ctas.offsetHeight
+      for (let n = ctas; n && n !== root.current; n = n.offsetParent) y += n.offsetTop
+      stage.copyBottom = y
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(root.current)
+    ro.observe(root.current.querySelector('.hero__title'))
+    ro.observe(root.current.querySelector('.hero__foot'))
+    return () => ro.disconnect()
+  }, [])
+
   useGSAP(
     (context, contextSafe) => {
       const q = gsap.utils.selector(root)
@@ -51,11 +77,11 @@ export default function Hero({ ready }) {
         .from(q('.hero__title em'), { rotate: -7, scale: 0.86, transformOrigin: '0% 100%', duration: 2, ease: 'expo.out' }, 0.35)
         .from(q('.hero__meta > *'), { y: 18, opacity: 0, duration: 1.2, stagger: 0.1 }, 0.6)
         .add(() => {
-          q('.hero__eyebrow-text, .readout dd').forEach((el, i) =>
+          q('.hero__eyebrow-text, .readout dd, .sunchip__text').forEach((el, i) =>
             scramble(el, { duration: 0.8 + Math.min(0.5, el.textContent.length * 0.02), delay: i * 0.06 }),
           )
         }, 0.62)
-        .from(q('.hero__lede, .hero__ctas > *'), { y: 28, opacity: 0, duration: 1.3, stagger: 0.08 }, 0.75)
+        .from(q('.hero__lede, .hero__ctas > *, .hero__chip'), { y: 28, opacity: 0, duration: 1.3, stagger: 0.08 }, 0.75)
 
       // Scroll-out: the sun climbs and blooms while the headline comes apart
       const scrub = { trigger: root.current, start: 'top top', end: 'bottom top', scrub: true }
@@ -63,7 +89,7 @@ export default function Hero({ ready }) {
       gsap.to(q('.hero__title'), { yPercent: -24, ease: 'none', scrollTrigger: { ...scrub } })
       gsap.to(lines[0], { xPercent: -16, opacity: 0.35, ease: 'none', scrollTrigger: { ...scrub } })
       gsap.to(lines[2], { xPercent: 14, opacity: 0.35, ease: 'none', scrollTrigger: { ...scrub } })
-      gsap.to(q('.hero__meta, .hero__foot'), {
+      gsap.to(q('.hero__meta, .hero__foot, .hero__chip'), {
         y: -60,
         opacity: 0,
         ease: 'none',
@@ -151,7 +177,9 @@ export default function Hero({ ready }) {
         <div className="hero__meta">
           <p className="hero__eyebrow mono">
             <span className="hero__pulse" aria-hidden="true" />
-            <span className="hero__eyebrow-text">Rooftop solar — {LOCATION.label}</span>
+            <span className="hero__eyebrow-text">
+              {BRAND.legalName} — {LOCATION.label}
+            </span>
           </p>
           <SunReadout className="hero__readout" />
         </div>
@@ -181,8 +209,8 @@ export default function Hero({ ready }) {
 
         <div className="hero__foot">
           <p className="hero__lede">
-            Rooftop solar for homes, farms and factories across Tamil Nadu. We handle the design, the subsidy
-            paperwork, the net meter and 25 years of care — one team, one phone number.
+            Solar power plants, water heaters, street lights and pumps for homes, farms and factories. Designed,
+            installed and looked after by one Chennai team since {BRAND.since} — one phone number.
           </p>
           <div className="hero__ctas">
             <Button href="#contact">Book a free site visit</Button>
@@ -191,6 +219,8 @@ export default function Hero({ ready }) {
             </Button>
           </div>
         </div>
+
+        <SunChip className="hero__chip" />
       </div>
     </section>
   )

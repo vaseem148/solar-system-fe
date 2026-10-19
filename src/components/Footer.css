@@ -34,6 +34,8 @@
 .foot__col { display: grid; align-content: start; justify-items: start; gap: 10px; }
 .foot__col .mono { color: var(--sun); margin-bottom: 6px; }
 .foot__col span { color: var(--muted); }
+.foot__addr { max-width: 26ch; color: var(--muted); line-height: 1.45; transition: color 0.3s; }
+.foot__addr:hover { color: var(--fg); }
 
 /* The horizon: sunset canvas + silhouette wordmark */
 .foot__horizon {
@@ -81,7 +83,8 @@
   margin: 0 0 -0.135em;
   font-stretch: 62%;
   font-weight: 800;
-  font-size: clamp(7rem, 37vw, 44rem);
+  /* sized to the brand's letter count so any name fills the width */
+  font-size: clamp(5rem, calc(178vw / var(--chars, 5)), 44rem);
   line-height: 0.8;
   letter-spacing: -0.02em;
   text-transform: uppercase;
