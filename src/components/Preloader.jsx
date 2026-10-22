@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { gsap, useGSAP } from '../lib/gsap'
-import { BRAND, LOCATION } from '../config'
+import { LOCATION } from '../config'
+import { Logo } from './ui/Logo'
 import './Preloader.css'
 
 const SEEN_KEY = 'solar:intro-seen'
@@ -74,7 +75,9 @@ export default function Preloader({ onReveal }) {
       <div className="pre__dawn" />
       <div className="pre__top mono">
         <span className="pre__reveal">
-          <span>{BRAND.name}</span>
+          <span>
+            <Logo className="pre__logo" />
+          </span>
         </span>
         <span className="pre__reveal">
           <span>Rooftop solar · {LOCATION.label}</span>

@@ -6,7 +6,7 @@ import { whatsappLink } from '../lib/leads'
 import Landscape from './Landscape'
 import { useNow } from './SunReadout'
 import { NAV_LINKS } from './Nav'
-import { SunMark } from './ui/Icons'
+import { Logo } from './ui/Logo'
 import './Footer.css'
 
 // A big, low sun that sets behind the mountains (and the wordmark) as you reach the bottom.
@@ -121,9 +121,8 @@ export default function Footer() {
     <footer ref={root} className="foot on-dark" data-tone="dark">
       <div className="container foot__top">
         <div className="foot__brand">
-          <a href="/" className="foot__logo">
-            <SunMark />
-            {BRAND.name}
+          <a href="/" className="foot__logo" aria-label={`${BRAND.legalName} — home`}>
+            <Logo decorative />
           </a>
           <p className="foot__tagline">
             {BRAND.tagline} Solar plants, water heaters, street lights and pumps — Chennai, since {BRAND.since}.

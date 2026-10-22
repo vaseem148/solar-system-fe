@@ -28,7 +28,7 @@ import ServiceDetails from './components/ServiceDetails'
 import { BlogList, BlogPost } from './components/Blog'
 import Footer from './components/Footer'
 import WhatsAppFab from './components/WhatsAppFab'
-import { SunMark } from './components/ui/Icons'
+import { Monogram } from './components/ui/Logo'
 
 const jumpToTop = () => {
   getLenis()?.scrollTo(0, { immediate: true, force: true })
@@ -336,7 +336,7 @@ export default function App() {
       <Footer />
       <WhatsAppFab />
       <div ref={curtain} className="curtain" aria-hidden="true">
-        <SunMark className="curtain__mark" />
+        <Monogram className="curtain__mark" />
         <p className="curtain__label" />
       </div>
       <div className="grain" aria-hidden="true" />

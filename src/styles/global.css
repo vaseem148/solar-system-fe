@@ -60,9 +60,23 @@
   --muted: rgb(20 18 15 / 0.62);
   --line: rgb(20 18 15 / 0.14);
   --card: #e6dece;
+  --logo-color: #2d6a3e;
   color-scheme: light;
 }
 [data-tone] { background-color: var(--bg); color: var(--fg); }
+
+/* The client's logo (components/ui/Logo.jsx): a mask, so it takes --logo-color — bone by default */
+.logo {
+  display: inline-block;
+  flex: none;
+  height: 1em;
+  aspect-ratio: 4.04;
+  background-color: var(--logo-color, var(--fg));
+  -webkit-mask: var(--logo-src) center / contain no-repeat;
+  mask: var(--logo-src) center / contain no-repeat;
+  transition: background-color 0.5s var(--ease-io), transform 0.9s var(--ease);
+}
+.logo--mark { aspect-ratio: 0.5095; }
 
 /* Sections that sit on their own fixed dark surface */
 .on-dark {
@@ -370,6 +384,7 @@ em { font-style: normal; }
 .curtain {
   --sun: #fff1c9;
   --bg: #ff5a1f;
+  --logo-color: var(--ink);
   position: fixed;
   inset: 0;
   z-index: 8800;
@@ -382,7 +397,7 @@ em { font-style: normal; }
   color: var(--ink);
   pointer-events: none;
 }
-.curtain__mark { width: clamp(48px, 5vw, 72px); height: auto; }
+.curtain__mark { height: clamp(90px, 10vw, 150px); }
 .curtain__label {
   font-stretch: 62%;
   font-weight: 800;

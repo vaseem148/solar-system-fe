@@ -4,7 +4,8 @@ import { gsap, ScrollTrigger, useGSAP } from '../lib/gsap'
 import { getLenis } from '../lib/scroll'
 import { scramble } from '../lib/interactions'
 import { BRAND, CONTACT } from '../config'
-import { SunMark, WhatsApp } from './ui/Icons'
+import { WhatsApp } from './ui/Icons'
+import { Logo } from './ui/Logo'
 import Button from './ui/Button'
 import { PAGES } from '../routes'
 import './Nav.css'
@@ -120,9 +121,8 @@ export default function Nav({ ready }) {
   return (
     <>
       <header ref={bar} className="nav">
-        <a href="/" className="nav__logo" aria-label={`${BRAND.name} — back to top`} onClick={close}>
-          <SunMark />
-          <span>{BRAND.name}</span>
+        <a href="/" className="nav__logo" aria-label={`${BRAND.legalName} — home`} onClick={close}>
+          <Logo decorative />
         </a>
 
         <nav className="nav__links" aria-label="Primary">

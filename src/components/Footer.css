@@ -12,17 +12,8 @@
 }
 
 .foot__brand { display: grid; align-content: start; gap: 16px; }
-.foot__logo {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 800;
-  font-stretch: 72%;
-  font-size: 1.6rem;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}
-.foot__logo svg { width: 34px; height: 34px; }
+.foot__logo { display: inline-flex; justify-self: start; }
+.foot__logo .logo { height: clamp(48px, 4.4vw, 62px); }
 .foot__tagline { color: var(--muted); max-width: 28ch; }
 .foot__tamil {
   font-family: var(--tamil);

@@ -29,19 +29,11 @@
 .menu-open .nav::before { opacity: 0; }
 .menu-open .nav { color: var(--bone); transform: none; }
 
-.nav__logo {
-  justify-self: start;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 800;
-  font-stretch: 72%;
-  font-size: 1.4rem;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}
-.nav__logo svg { width: 30px; height: 30px; transition: transform 0.9s var(--ease); }
-.nav__logo:hover svg { transform: rotate(-10deg) scale(1.08); }
+.nav__logo { justify-self: start; display: inline-flex; align-items: center; }
+.nav__logo .logo { height: 38px; transform-origin: 0% 50%; }
+.nav__logo:hover .logo { transform: scale(1.04); }
+/* the open menu is dark whatever section is behind it */
+.menu-open .nav { --logo-color: var(--bone); }
 
 .nav__links {
   position: relative;
@@ -188,4 +180,5 @@
 
 @media (max-width: 560px) {
   .nav__cta { display: none; }
+  .nav__logo .logo { height: 32px; }
 }
