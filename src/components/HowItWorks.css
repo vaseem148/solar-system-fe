@@ -116,7 +116,7 @@
 }
 
 .how__svg .ground line { stroke: rgb(242 237 228 / 0.08); stroke-width: 1; }
-.how__svg .ao { fill: #000; opacity: 0.55; }
+.how__svg .ao { fill: url(#how-ao); }
 
 .how__svg .h-floor { fill: #221e1a; }
 .how__svg .h-inner-back { fill: #2a2520; }
@@ -129,7 +129,8 @@
 .how__svg .h-win { fill: #0b0a08; stroke: rgb(242 237 228 / 0.2); stroke-width: 1; }
 .how__svg .h-door { fill: #3a2614; stroke: rgb(242 237 228 / 0.2); stroke-width: 1; }
 .how__svg .h-mullion { stroke: rgb(242 237 228 / 0.18); stroke-width: 1; }
-.how__svg .win-lit { fill: #ffbf5a; }
+/* a soft rim stands in for a blur glow */
+.how__svg .win-lit { fill: #ffbf5a; stroke: #ffbf5a; stroke-width: 6; stroke-opacity: 0.32; stroke-linejoin: round; paint-order: stroke; }
 .how__svg .h-shade-top { fill: #3a352e; }
 .how__svg .h-shade-edge { fill: #2a2621; }
 
@@ -184,6 +185,17 @@
 
 @keyframes how-flow { to { stroke-dashoffset: -24; } }
 
+/* a wide, faint stroke under each flow does the glowing */
+.how__svg .halo {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 8;
+  stroke-opacity: 0.16;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.how__svg .halo--grid { stroke: var(--sun); }
+
 .how__svg .pole { stroke: #4a443c; stroke-width: 5; stroke-linecap: round; }
 .how__svg .pole-arm { stroke: #5a5349; stroke-width: 3.5; stroke-linecap: round; }
 .how__svg .insulator { fill: #8a8378; }
@@ -207,7 +219,7 @@
   fill: rgb(242 237 228 / 0.55);
 }
 
-.how__svg .credit rect { fill: var(--sun); }
+.how__svg .credit rect { fill: var(--sun); stroke: var(--sun); stroke-width: 8; stroke-opacity: 0.25; paint-order: stroke; }
 .how__svg .credit text {
   font-family: var(--mono);
   font-size: 10.5px;
@@ -235,8 +247,8 @@
 .how__svg .palm__nut { fill: #5a3d22; }
 
 /* Energy sparks + the light sweep across the array */
-.how__svg .spark { fill: #fff1c9; opacity: 0; }
-.how__svg .sweep { mix-blend-mode: screen; pointer-events: none; }
+.how__svg .spark { fill: url(#how-spark); opacity: 0; }
+.how__svg .sweep { pointer-events: none; }
 .how__svg .inv-kw { fill: var(--gold); font-weight: 500; }
 
 /* ── Mobile: scene on top, copy below ─────── */

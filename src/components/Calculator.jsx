@@ -4,7 +4,7 @@ import { CALC } from '../config'
 import { estimate } from '../lib/solar'
 import { inr, inrWords, trim, num, rupees } from '../lib/format'
 import { prefillContact } from '../lib/prefill'
-import { scrollToTarget } from '../lib/scroll'
+import { goTo } from '../lib/navigate'
 import Label from './ui/Label'
 import Button from './ui/Button'
 import Odometer from './ui/Odometer'
@@ -252,7 +252,7 @@ export default function Calculator() {
 
   const getQuote = () => {
     prefillContact({ bill: Math.round(bill / months), property: type === 'home' ? 'Home' : 'Business' })
-    scrollToTarget('#contact')
+    goTo('/contact')
   }
 
   const ref = (key) => (el) => {
@@ -267,7 +267,7 @@ export default function Calculator() {
     <section ref={root} id="calculator" className="calc section" data-tone="dark">
       <div className="container">
         <header className="calc__head">
-          <Label index="05">Savings calculator</Label>
+          <Label index="01">Free estimate</Label>
           <h2 className="title" data-reveal="lines">
             What’s your roof
             <br /> really <em>worth?</em>

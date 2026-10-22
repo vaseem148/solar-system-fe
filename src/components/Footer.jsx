@@ -36,7 +36,14 @@ const hm = new Intl.DateTimeFormat('en-GB', {
   hourCycle: 'h23',
 })
 
-const SERVICES = ['Rooftop solar', 'Water heaters', 'Street lights', 'Solar pumps', 'Inverters', 'Maintenance']
+const SERVICES = [
+  ['Solar power plants', '/products#solar-power-plant'],
+  ['Water heaters', '/products#solar-water-heater'],
+  ['Street lights', '/products#solar-street-light'],
+  ['Pumps & on-grid inverters', '/products#other-solar-products'],
+  ['Off-grid inverters', '/products#digital-inverter'],
+  ['Installation & maintenance', '/services'],
+]
 
 export default function Footer() {
   const root = useRef(null)
@@ -114,7 +121,7 @@ export default function Footer() {
     <footer ref={root} className="foot on-dark" data-tone="dark">
       <div className="container foot__top">
         <div className="foot__brand">
-          <a href="#top" className="foot__logo">
+          <a href="/" className="foot__logo">
             <SunMark />
             {BRAND.name}
           </a>
@@ -137,9 +144,9 @@ export default function Footer() {
 
         <div className="foot__col">
           <p className="mono">Services</p>
-          {SERVICES.map((s) => (
-            <a key={s} href="#services" className="ulink">
-              {s}
+          {SERVICES.map(([label, href]) => (
+            <a key={label} href={href} className="ulink">
+              {label}
             </a>
           ))}
         </div>
@@ -204,7 +211,7 @@ export default function Footer() {
         <span>
           MSME UAN {CREDENTIALS.msme} · GSTIN {CREDENTIALS.gst}
         </span>
-        <a href="#top" className="foot__top-link">
+        <a href="#" className="foot__top-link">
           <span className="ulink">Back to top</span>
           <span className="foot__arrow" aria-hidden="true">
             ↑

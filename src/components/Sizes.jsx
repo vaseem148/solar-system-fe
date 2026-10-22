@@ -371,7 +371,7 @@ export default function Sizes() {
     <section ref={root} id="sizes" className="sizes section" data-tone="dark">
       <div className="container">
         <header className="sizes__head">
-          <Label index="07">Typical systems</Label>
+          <Label index="02">Typical systems</Label>
           <h2 className="title" data-reveal="lines">
             Sized for
             <br /> <em>your</em> roof.

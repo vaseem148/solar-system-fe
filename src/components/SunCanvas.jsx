@@ -16,12 +16,15 @@ export default function SunCanvas({ variant = 'rise', layout, state, className =
     host.current.appendChild(canvas)
 
     let renderer
-    try {
-      renderer = new SunRenderer(canvas, { variant, layout, state })
-    } catch (err) {
+    const fail = (err) => {
       console.warn('Sun shader unavailable, using CSS fallback:', err)
       canvas.remove()
       setFailed(true)
+    }
+    try {
+      renderer = new SunRenderer(canvas, { variant, layout, state, onError: fail })
+    } catch (err) {
+      fail(err)
       return
     }
 

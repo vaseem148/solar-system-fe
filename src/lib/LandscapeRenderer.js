@@ -3,6 +3,8 @@
 // roof — lit by a sun that rises as you scroll. One full-screen triangle, one
 // fragment shader, no libraries (same shape as SunRenderer).
 
+import { createProgram } from './glProgram'
+
 const VERT = /* glsl */ `
 attribute vec2 aPos;
 void main() { gl_Position = vec4(aPos, 0.0, 1.0); }
@@ -31,6 +33,7 @@ uniform vec3 uMistCol;
 uniform vec3 uLit;
 uniform vec3 uShade;
 uniform vec3 uForest;
+uniform sampler2D uNoise; // 256² random values; each texel holds its own value and its +x, +y, +xy neighbours
 
 // Scene units: y runs 0 (bottom) … 1 (top), x runs 0 … aspect.
 float ASPECT; // width / height
@@ -53,10 +56,13 @@ float h11(float n) {
   return fract(n);
 }
 
+// Value noise reads its lattice from uNoise — one fetch per sample (the four corners are packed into
+// RGBA). Hashing inline compiled to so many instructions that Windows' D3D compiler took ~14 s.
 float n11(float x) {
   float i = floor(x);
   float f = fract(x);
-  return mix(h11(i), h11(i + 1.0), f * f * (3.0 - 2.0 * f));
+  vec4 c = texture2D(uNoise, vec2(i + 0.5, 7.5) / 256.0);
+  return mix(c.r, c.g, f * f * (3.0 - 2.0 * f));
 }
 
 float h21(vec2 p) {
@@ -69,7 +75,8 @@ float n21(vec2 p) {
   vec2 i = floor(p);
   vec2 f = fract(p);
   vec2 u = f * f * (3.0 - 2.0 * f);
-  return mix(mix(h21(i), h21(i + vec2(1.0, 0.0)), u.x), mix(h21(i + vec2(0.0, 1.0)), h21(i + vec2(1.0, 1.0)), u.x), u.y);
+  vec4 c = texture2D(uNoise, (i + 0.5) / 256.0);
+  return mix(mix(c.r, c.g, u.x), mix(c.b, c.a, u.x), u.y);
 }
 
 float fbm1(float x) {
@@ -173,6 +180,21 @@ float trees(vec2 q, float cell, float hMin, float hMax, float density, float aut
   return cov;
 }
 
+// A dense stand of pines as a ragged triangle wave: one tree per cell, random heights, tiered sides.
+// Far cheaper than trees() (no neighbour search), which keeps the shader quick to compile.
+float forest(vec2 q, float cell, float hMin, float hMax, float seed, out float id, out float side) {
+  float g = q.x / cell;
+  float i = floor(g);
+  float f = fract(g) - 0.5;
+  float h = mix(hMin, hMax, h11(i * 4.13 + seed));
+  float t = clamp(q.y / h, 0.0, 1.0);
+  float tier = fract(t * 4.0 + 0.25);
+  float w = 0.5 * (1.0 - t) * (0.72 + 0.28 * (1.0 - tier));
+  id = 0.1 + h11(i * 9.7 + seed) * 0.8;
+  side = f * 2.0;
+  return smoothstep(-AA, AA, (w - abs(f)) * cell) * step(q.y, h) * step(0.0, q.y);
+}
+
 vec3 treeCol(float id, float side, float light) {
   vec3 c = uForest * (0.8 + 0.4 * fract(id));
   if (id > 1.0) c = mix(vec3(0.72, 0.45, 0.17), vec3(0.82, 0.64, 0.25), fract(id)) * (1.0 - 0.65 * uNight);
@@ -213,7 +235,7 @@ vec3 meadowCol(float z, vec2 p, float x, float y, float G, float slope) {
 }
 
 vec3 canopyCol(vec2 p, float x, float y, float light, float autumn) {
-  float t = fbm2(vec2(x * 48.0, y * 36.0)) * 0.75 + n21(vec2(x * 130.0, y * 95.0)) * 0.25;
+  float t = n21(vec2(x * 48.0, y * 36.0)) * 0.45 + n21(vec2(x * 110.0, y * 80.0)) * 0.3 + 0.12;
   vec3 c = uForest * (0.68 + 0.62 * t);
   // a few autumn crowns scattered through the forest
   float au = smoothstep(0.64, 0.74, fbm2(vec2(x * 18.0 + 7.0, y * 15.0))) * autumn;
@@ -368,7 +390,7 @@ void main() {
       float fm = smoothstep(0.3, 0.62, n11(x * 1.5 + 2.0));
       float G = g5(x) - (1.0 - fm) * 0.3 * S;
       float light = reach(y) * 0.6;
-      float tc = trees(vec2(x, y - G), 0.017 * S, 0.035 * S, 0.06 * S, 0.92 * smoothstep(0.25, 0.6, fm), 0.05, 7.0, id, side);
+      float tc = forest(vec2(x, y - G), 0.017 * S, 0.035 * S, 0.06 * S * smoothstep(0.25, 0.6, fm), 7.0, id, side);
       if (tc > 0.0) BLEND(treeCol(id, side, light), tc);
       float cov = smoothstep(-AA, AA, G - y);
       if (cov > 0.0) BLEND(canopyCol(p, x, y, light, 1.0), cov);
@@ -391,7 +413,7 @@ void main() {
       float G = g4(x);
       float fm = smoothstep(0.42, 0.7, n11(x * 1.3 + 5.0));
       if (fm > 0.0) {
-        float tc = trees(vec2(x, y - G), 0.011 * S, 0.016 * S, 0.028 * S, 0.95 * fm, 0.04, 13.0, id, side);
+        float tc = forest(vec2(x, y - G), 0.011 * S, 0.016 * S * fm, 0.028 * S * fm, 13.0, id, side);
         if (tc > 0.0) BLEND(mix(treeCol(id, side, reach(y) * 0.6), MIST, 0.16), tc);
       }
       float cov = smoothstep(-AA, AA, G - y);
@@ -413,7 +435,7 @@ void main() {
     float y = p.y + (uCam * 0.14 - par.y) * z;
     if (y < H + 0.11 * S) {
       float G = g3(x);
-      float tc = trees(vec2(x, y - G), 0.007 * S, 0.009 * S, 0.016 * S, 0.9, 0.0, 23.0, id, side);
+      float tc = forest(vec2(x, y - G), 0.007 * S, 0.009 * S, 0.016 * S, 23.0, id, side);
       float cov = max(smoothstep(-AA, AA, G - y), tc);
       if (cov > 0.0) {
         float slope = (g3(x + e) - g3(x - e)) / (2.0 * e);
@@ -578,7 +600,7 @@ export class LandscapeRenderer {
    *   layout() works in scene units: y 0 (bottom) … 1 (top), x 0 … width / height. A house size of 0 (or
    *   props: false, for the lone tree) leaves those out.
    */
-  constructor(canvas, { palette = 'sunrise', layout, state }) {
+  constructor(canvas, { palette = 'sunrise', layout, state, onError }) {
     const gl = canvas.getContext('webgl', {
       alpha: false,
       antialias: false,
@@ -602,17 +624,10 @@ export class LandscapeRenderer {
     this.slowFrames = 0
     this.last = 0
 
-    const program = this.#program(VERT, FRAG)
-    gl.useProgram(program)
-
-    const buffer = gl.createBuffer()
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW)
-    const aPos = gl.getAttribLocation(program, 'aPos')
-    gl.enableVertexAttribArray(aPos)
-    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0)
-
-    this.u = Object.fromEntries(UNIFORMS.map((n) => [n, gl.getUniformLocation(program, n)]))
+    // Compiled in the background where the browser allows; #setup() runs once it has linked
+    this.prog = createProgram(gl, VERT, FRAG)
+    this.onError = onError
+    this.ready = false
 
     if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
       this.onPointer = (e) => {
@@ -625,21 +640,70 @@ export class LandscapeRenderer {
     this.resize()
   }
 
-  #program(vs, fs) {
-    const gl = this.gl
-    const compile = (type, src) => {
-      const s = gl.createShader(type)
-      gl.shaderSource(s, src)
-      gl.compileShader(s)
-      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s) ?? 'shader')
-      return s
+  /** True once the program is linked and set up; a failed compile is reported through onError. */
+  #poll() {
+    if (this.ready) return true
+    if (this.failed) return false
+    try {
+      if (!this.prog.ready()) return false
+    } catch (err) {
+      this.failed = true
+      this.pause()
+      this.onError?.(err)
+      return false
     }
-    const p = gl.createProgram()
-    gl.attachShader(p, compile(gl.VERTEX_SHADER, vs))
-    gl.attachShader(p, compile(gl.FRAGMENT_SHADER, fs))
-    gl.linkProgram(p)
-    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p) ?? 'link')
-    return p
+    this.#setup()
+    return true
+  }
+
+  #setup() {
+    const { gl } = this
+    const program = this.prog.program
+    gl.useProgram(program)
+
+    const buffer = gl.createBuffer()
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW)
+    const aPos = gl.getAttribLocation(program, 'aPos')
+    gl.enableVertexAttribArray(aPos)
+    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0)
+
+    this.u = Object.fromEntries(UNIFORMS.map((n) => [n, gl.getUniformLocation(program, n)]))
+
+    // Noise lattice: a seeded random value per texel, with its right, upper and diagonal neighbours
+    // packed into G, B and A so the shader interpolates a cell from a single fetch
+    const N = 256
+    const v = new Uint8Array(N * N)
+    let seed = 0x9e3779b9
+    for (let i = 0; i < v.length; i++) {
+      seed = (seed + 0x6d2b79f5) | 0
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed)
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+      v[i] = ((t ^ (t >>> 14)) >>> 0) & 255
+    }
+    const px = new Uint8Array(N * N * 4)
+    for (let y = 0; y < N; y++) {
+      for (let x = 0; x < N; x++) {
+        const o = (y * N + x) * 4
+        const x1 = (x + 1) % N
+        const y1 = (y + 1) % N
+        px[o] = v[y * N + x]
+        px[o + 1] = v[y * N + x1]
+        px[o + 2] = v[y1 * N + x]
+        px[o + 3] = v[y1 * N + x1]
+      }
+    }
+    this.noise = gl.createTexture()
+    gl.activeTexture(gl.TEXTURE0)
+    gl.bindTexture(gl.TEXTURE_2D, this.noise)
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, N, N, 0, gl.RGBA, gl.UNSIGNED_BYTE, px)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT)
+    gl.uniform1i(gl.getUniformLocation(program, 'uNoise'), 0)
+    this.ready = true
+    this.canvas.style.opacity = '1'
   }
 
   resize() {
@@ -655,6 +719,7 @@ export class LandscapeRenderer {
   }
 
   draw(now) {
+    if (!this.#poll()) return
     const { gl, u, state, mouse } = this
     mouse.x += (mouse.tx - mouse.x) * 0.04
     mouse.y += (mouse.ty - mouse.y) * 0.04
@@ -684,7 +749,7 @@ export class LandscapeRenderer {
     this.raf = requestAnimationFrame(this.loop)
 
     // Adaptive quality: drop resolution first, then the atmospheric extras
-    if (this.last) {
+    if (this.last && this.ready) {
       const dt = now - this.last
       this.slowFrames = dt > 34 ? this.slowFrames + 1 : Math.max(0, this.slowFrames - 1)
       if (this.slowFrames > 40) {

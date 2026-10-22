@@ -1,20 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { gsap, ScrollTrigger, useGSAP } from '../lib/gsap'
 import { getLenis } from '../lib/scroll'
 import { scramble } from '../lib/interactions'
 import { BRAND, CONTACT } from '../config'
 import { SunMark, WhatsApp } from './ui/Icons'
 import Button from './ui/Button'
+import { PAGES } from '../routes'
 import './Nav.css'
 
-export const NAV_LINKS = [
-  { href: '#how', label: 'How it works' },
-  { href: '#services', label: 'Services' },
-  { href: '#about', label: 'About' },
-  { href: '#calculator', label: 'Savings' },
-  { href: '#process', label: 'Process' },
-  { href: '#faq', label: 'FAQ' },
-]
+// Pages in the link list (the free estimate has its own button)
+export const NAV_LINKS = PAGES.filter((p) => p.nav !== false).map((p) => ({ href: p.path, label: p.label }))
+const isCurrent = (href, pathname) => href === pathname || (href !== '/' && pathname.startsWith(`${href}/`))
 
 export default function Nav({ ready }) {
   const bar = useRef(null)
@@ -23,6 +20,8 @@ export default function Nav({ ready }) {
   const menuTl = useRef(null)
   const [open, setOpen] = useState(false)
   const openRef = useRef(false)
+  const setActiveRef = useRef(null)
+  const { pathname } = useLocation()
   openRef.current = open
 
   useGSAP(() => {
@@ -47,7 +46,7 @@ export default function Nav({ ready }) {
       onToggle: (self) => bar.current?.classList.toggle('is-solid', self.isActive),
     })
 
-    // Active section: a small sun glides under the link you're reading
+    // Current page: a small sun glides under its link
     const links = gsap.utils.toArray('.nav__link', bar.current)
     const dot = bar.current.querySelector('.nav__dot')
     gsap.set(dot, { autoAlpha: 0, scale: 0.4 })
@@ -63,20 +62,7 @@ export default function Nav({ ready }) {
       const l = links[i]
       gsap.to(dot, { x: l.offsetLeft + l.offsetWidth / 2, autoAlpha: 1, scale: 1, duration: 0.8, ease: 'expo.out', overwrite: 'auto' })
     }
-    NAV_LINKS.forEach((l, i) => {
-      const target = document.querySelector(l.href)
-      if (!target) return
-      ScrollTrigger.create({
-        trigger: target,
-        start: 'top 50%',
-        end: 'bottom 50%',
-        refreshPriority: -1,
-        onToggle: (self) => {
-          if (self.isActive) setActive(i)
-          else if (active === i) setActive(-1)
-        },
-      })
-    })
+    setActiveRef.current = setActive
 
     // Hairline reading progress along the bottom of the solid bar
     gsap.fromTo(
@@ -102,6 +88,10 @@ export default function Nav({ ready }) {
   useEffect(() => {
     if (ready) intro.current?.play()
   }, [ready])
+
+  useEffect(() => {
+    setActiveRef.current?.(NAV_LINKS.findIndex((l) => isCurrent(l.href, pathname)))
+  }, [pathname])
 
   useEffect(() => {
     const lenis = getLenis()
@@ -130,14 +120,14 @@ export default function Nav({ ready }) {
   return (
     <>
       <header ref={bar} className="nav">
-        <a href="#top" className="nav__logo" aria-label={`${BRAND.name} — back to top`} onClick={close}>
+        <a href="/" className="nav__logo" aria-label={`${BRAND.name} — back to top`} onClick={close}>
           <SunMark />
           <span>{BRAND.name}</span>
         </a>
 
         <nav className="nav__links" aria-label="Primary">
           {NAV_LINKS.map((l) => (
-            <a key={l.href} href={l.href} className="nav__link">
+            <a key={l.href} href={l.href} className="nav__link" aria-current={isCurrent(l.href, pathname) ? 'page' : undefined}>
               <span data-text={l.label}>{l.label}</span>
             </a>
           ))}
@@ -145,8 +135,8 @@ export default function Nav({ ready }) {
         </nav>
 
         <div className="nav__right">
-          <Button href="#contact" size="sm" className="nav__cta">
-            Free site visit
+          <Button href="/estimate" size="sm" className="nav__cta">
+            Free estimate
           </Button>
           <button
             type="button"
@@ -169,7 +159,7 @@ export default function Nav({ ready }) {
         <div className="menu__glow" aria-hidden="true" />
         <nav aria-label="Menu">
           <ul className="menu__list">
-            {[...NAV_LINKS, { href: '#contact', label: 'Contact' }].map((l, i) => (
+            {[...NAV_LINKS, { href: '/estimate', label: 'Free estimate' }].map((l, i) => (
               <li key={l.href}>
                 <a href={l.href} className="menu__link" onClick={close}>
                   <span>

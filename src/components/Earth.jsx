@@ -76,7 +76,7 @@ export default function Earth() {
   return (
     <section ref={root} id="earth" className="earth" data-tone="light" aria-labelledby="earth-title">
       <div className="earth__stage">
-        <Landscape className="earth__scene" layout={earthLayout} state={scene} />
+        <Landscape className="earth__scene" layout={earthLayout} state={scene} warm />
 
         <div className="earth__birds" aria-hidden="true">
           {BIRDS.map((b, i) => (
@@ -112,7 +112,7 @@ export default function Earth() {
               <dd>{TREES}</dd>
             </div>
           </dl>
-          <a href="#calculator" className="earth__link mono">
+          <a href="/estimate" className="earth__link mono">
             <span className="ulink">See what your roof could save</span> →
           </a>
         </div>

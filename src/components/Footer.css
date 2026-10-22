@@ -50,7 +50,7 @@
 }
 
 .foot__sun { z-index: -2; }
-.foot__sun.land--fallback {
+.foot__sun {
   background:
     radial-gradient(40% 50% at 50% 70%, #ffd9a0 0, #ff7a2e 22%, rgb(255 106 42 / 0.2) 48%, transparent 70%),
     linear-gradient(180deg, #151b3d 0%, #5b3d72 45%, #f2864f 70%, #262a4a 71%, #121a1d 100%);

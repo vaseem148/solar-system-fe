@@ -5,14 +5,14 @@
   height: 320vh;
 }
 
-/* the page colour melts into the dawn sky as the section arrives (scrolls away before the stage pins) */
+/* the light section above melts into the dawn sky (scrolls away before the stage pins) */
 .earth::before {
   content: '';
   position: absolute;
   inset: 0 0 auto;
   z-index: 1;
   height: 24vh;
-  background: linear-gradient(var(--bg), transparent);
+  background: linear-gradient(#efe9dd, transparent);
   pointer-events: none;
 }
 
@@ -27,11 +27,12 @@
 }
 
 .land { position: absolute; inset: 0; }
-.land canvas { width: 100%; height: 100%; }
+.land canvas { width: 100%; height: 100%; opacity: 0; transition: opacity 0.8s; }
+.earth__scene,
 .land--fallback {
   background:
-    radial-gradient(40% 30% at 78% 22%, #fff3d1 0%, rgb(255 240 196 / 0) 70%),
-    linear-gradient(180deg, #74acdc 0%, #b6d8ee 42%, #9db7c9 58%, #4a7a47 72%, #1e3d30 100%);
+    radial-gradient(40% 30% at 78% 50%, #ffd9b0 0%, rgb(255 217 176 / 0) 70%),
+    linear-gradient(180deg, #8a9fcd 0%, #d9c2d3 38%, #f1d2c4 50%, #bba9c8 56%, #566b98 66%, #5c7869 78%, #22403e 100%);
 }
 .earth__scene { z-index: -2; }
 

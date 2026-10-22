@@ -76,7 +76,7 @@ export default function FinePrint() {
     <section ref={root} id="promise" className="promise section" data-tone="light">
       <div className="container promise__grid">
         <header className="promise__head">
-          <Label index="08">Our promise</Label>
+          <Label index="02">Our promise</Label>
           <h2 className="title" data-reveal="lines">
             The fine print,
             <br /> <em>in large print.</em>

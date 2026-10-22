@@ -16,9 +16,26 @@ const FACTS = [
   ['Established', `${BRAND.since} · Chennai`],
   ['Proprietor', BRAND.proprietor],
   ['Head office', 'Thirumullaivoyal, Chennai'],
+  ['Branch office', '2nd Street, Santhipuram, Thirumullaivoyal'],
   ['What we do', 'Supply, installation & maintenance'],
   ['MSME UAN', CREDENTIALS.msme],
   ['GSTIN', CREDENTIALS.gst],
+]
+
+// "Why choose us", from the client's old About page
+const WHY = [
+  {
+    title: 'Our team',
+    text: 'Qualified, experienced professionals who work hard to deliver products and services on time, making the best use of technology.',
+  },
+  {
+    title: 'Our infrastructure',
+    text: 'A modern set-up, organised into departments and units, that lets us produce and supply our products in bulk.',
+  },
+  {
+    title: 'Quality assurance',
+    text: 'Quality comes first: every product is made from fine materials and checked against set parameters before it reaches you.',
+  },
 ]
 
 // Real Suryan installations. `at` only where the client named the site.
@@ -79,7 +96,7 @@ export default function About() {
     <section ref={root} id="about" className="about section" data-tone="dark">
       <div className="container">
         <header className="about__head">
-          <Label index="04">Who we are</Label>
+          <Label index="01">Who we are</Label>
           <h2 className="title" data-reveal="lines">
             Chennai’s own
             <br /> solar people, <em>since {BRAND.since}.</em>
@@ -113,6 +130,19 @@ export default function About() {
               </div>
             ))}
           </dl>
+        </div>
+
+        <div className="why">
+          <p className="mono why__label">Why choose us</p>
+          <ul className="why__grid">
+            {WHY.map((w, i) => (
+              <li key={w.title} className="why__item" data-reveal="up">
+                <span className="why__num">{String(i + 1).padStart(2, '0')}</span>
+                <h3 className="why__title">{w.title}</h3>
+                <p className="why__text">{w.text}</p>
+              </li>
+            ))}
+          </ul>
         </div>
 
         <div className="work">

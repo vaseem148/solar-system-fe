@@ -100,7 +100,7 @@ export default function HowItWorks() {
 
       gsap.set(q('.ray, .leg'), { strokeDasharray: 1, strokeDashoffset: 1 })
       gsap.set(q('.panel'), { y: -80, autoAlpha: 0 })
-      gsap.set(q('.flow, .win-lit, .callout, .roof-heat, .glint, .arr-shadow, .sky, .sweep'), { autoAlpha: 0 })
+      gsap.set(q('.flow, .halo, .win-lit, .callout, .roof-heat, .glint, .arr-shadow, .sky, .sweep'), { autoAlpha: 0 })
       gsap.set(q('.credit'), { autoAlpha: 0, y: 12, scale: 0.7, transformOrigin: '50% 50%' })
       gsap.set(q('.sky-sun'), { y: 70, x: 30, autoAlpha: 0 })
       gsap.set(steps.slice(1), { autoAlpha: 0, y: 44 })
@@ -156,7 +156,7 @@ export default function HowItWorks() {
       // 3 · The inverter converts it
       swap(2)
       shot(1.36, focus.inverter, AT[2])
-      tl.to(q('.flow--dc'), { autoAlpha: 1, duration: 0.4 }, AT[2] + 0.1)
+      tl.to(q('.flow--dc, .halo--dc'), { autoAlpha: 1, duration: 0.4 }, AT[2] + 0.1)
         .fromTo(q('.sweep'), { x: 360, autoAlpha: 1 }, { x: 720, duration: 0.7, ease: 'power1.inOut', immediateRender: false }, AT[2] + 0.15)
         .set(q('.sweep'), { autoAlpha: 0 }, AT[2] + 0.85)
         .to(q('.led'), { fill: '#3ddc84', duration: 0.1 }, AT[2] + 0.5)
@@ -171,7 +171,7 @@ export default function HowItWorks() {
       // 4 · Your home runs on it — dusk falls so the lit windows glow
       swap(3)
       shot(1.08, focus.house, AT[3])
-      tl.to(q('.flow--ac, .flow--home'), { autoAlpha: 1, duration: 0.4 }, AT[3] + 0.1)
+      tl.to(q('.flow--ac, .flow--home, .halo--ac, .halo--home'), { autoAlpha: 1, duration: 0.4 }, AT[3] + 0.1)
         .to(q('.sky--dusk'), { autoAlpha: 1, duration: 1 }, AT[3])
         .to(q('.sky--day'), { autoAlpha: 0.25, duration: 1 }, AT[3])
         .to(q('.sky-sun'), { y: 46, x: -14, duration: 1.2, ease: 'power1.inOut' }, AT[3])
@@ -183,7 +183,7 @@ export default function HowItWorks() {
       // 5 · The meter runs backwards
       swap(4)
       shot(1.24, focus.export, AT[4])
-      tl.to(q('.flow--grid'), { autoAlpha: 1, duration: 0.4 }, AT[4] + 0.1)
+      tl.to(q('.flow--grid, .halo--grid'), { autoAlpha: 1, duration: 0.4 }, AT[4] + 0.1)
         .to(q('.callout--home'), { autoAlpha: 0.3, duration: 0.3 }, AT[4])
         .to(q('.callout--grid, .callout--meter'), { autoAlpha: 1, duration: 0.3 }, AT[4] + 0.3)
         .to(
@@ -286,7 +286,7 @@ export default function HowItWorks() {
     <section ref={root} id="how" className="how" data-tone="dark">
       <div className="how__pin">
         <div className="how__copy">
-          <Label index="02">How it works</Label>
+          <Label index="01">How it works</Label>
           <h2 className="how__title">
             Five things happen between sunrise and a <em>smaller bill.</em>
           </h2>
@@ -379,16 +379,18 @@ export default function HowItWorks() {
                   <polygon key={p.key} points={p.shape} />
                 ))}
               </clipPath>
-              <filter id="how-glow" x="-60%" y="-60%" width="220%" height="220%">
-                <feGaussianBlur stdDeviation="3.2" result="b" />
-                <feMerge>
-                  <feMergeNode in="b" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
-              </filter>
-              <filter id="how-soft" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="14" />
-              </filter>
+              {/* Glows and the soft shadow are gradients, not blur filters: an SVG filter is re-rendered on
+                  every frame that anything under it moves, which made this scene stutter */}
+              <radialGradient id="how-spark">
+                <stop offset="0" stopColor="#fff6dc" />
+                <stop offset="0.35" stopColor="#ffd98a" stopOpacity="0.55" />
+                <stop offset="1" stopColor="#ffb23f" stopOpacity="0" />
+              </radialGradient>
+              <radialGradient id="how-ao">
+                <stop offset="0" stopColor="#000" stopOpacity="0.6" />
+                <stop offset="0.45" stopColor="#000" stopOpacity="0.38" />
+                <stop offset="0.72" stopColor="#000" stopOpacity="0" />
+              </radialGradient>
             </defs>
 
             {/* Sky tint — fixed to the frame, not the camera */}
@@ -421,7 +423,7 @@ export default function HowItWorks() {
                   <line key={i} {...l} />
                 ))}
               </g>
-              <polygon className="ao" points={footprintShadow} filter="url(#how-soft)" />
+              <polygon className="ao" points={footprintShadow} />
 
               {/* Terrace interior */}
               <polygon className="h-floor" points={house.floor} />
@@ -439,7 +441,7 @@ export default function HowItWorks() {
                 <g key={w.key}>
                   <polygon className={w.door ? 'h-door' : 'h-win'} points={w.shape} />
                   {w.mullion && <line className="h-mullion" {...w.mullion} />}
-                  {!w.door && <polygon className="win-lit" points={w.shape} filter="url(#how-glow)" />}
+                  {!w.door && <polygon className="win-lit" points={w.shape} />}
                   {!w.door && <polygon className="h-shade-top" points={w.shadeTop} />}
                   {!w.door && <polygon className="h-shade-edge" points={w.shadeEdge} />}
                 </g>
@@ -524,13 +526,17 @@ export default function HowItWorks() {
               <path className="cable" d={cables.ac} />
               <path className="cable" d={cables.home} />
               <path className="cable cable--wire" d={gridPath} />
-              <path className="flow flow--dc" d={cables.dc} filter="url(#how-glow)" />
-              <path className="flow flow--ac" d={cables.ac} filter="url(#how-glow)" />
-              <path className="flow flow--home" d={cables.home} filter="url(#how-glow)" />
-              <path className="flow flow--grid" d={gridPath} filter="url(#how-glow)" />
+              <path className="halo halo--dc" d={cables.dc} />
+              <path className="halo halo--ac" d={cables.ac} />
+              <path className="halo halo--home" d={cables.home} />
+              <path className="halo halo--grid" d={gridPath} />
+              <path className="flow flow--dc" d={cables.dc} />
+              <path className="flow flow--ac" d={cables.ac} />
+              <path className="flow flow--home" d={cables.home} />
+              <path className="flow flow--grid" d={gridPath} />
               {Object.entries(SPARKS).map(([k, n]) =>
                 Array.from({ length: n }, (_, i) => (
-                  <circle key={`${k}${i}`} className={`spark spark--${k}`} r="2.6" cx="-20" cy="-20" filter="url(#how-glow)" />
+                  <circle key={`${k}${i}`} className={`spark spark--${k}`} r="6" cx="-20" cy="-20" />
                 )),
               )}
 
@@ -571,7 +577,7 @@ export default function HowItWorks() {
             <g data-follow="" data-ax={anchors.meter[0]} data-ay={anchors.meter[1]}>
               <g transform={`translate(${anchors.meter[0] + 30} ${anchors.meter[1] - 64})`}>
                 <g className="credit">
-                  <rect x="0" y="-14" width="156" height="28" rx="14" filter="url(#how-glow)" />
+                  <rect x="0" y="-14" width="156" height="28" rx="14" />
                   <text x="78" y="4" textAnchor="middle">
                     −231 units this month
                   </text>

@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { gsap, useGSAP, prefersReducedMotion } from '../lib/gsap'
 import { CONTACT } from '../config'
-import { onPrefill } from '../lib/prefill'
+import { onPrefill, takePrefill } from '../lib/prefill'
 import { submitLead, validateLead, whatsappLink, isOpenNow } from '../lib/leads'
 import { useNow } from './SunReadout'
 import Label from './ui/Label'
@@ -140,18 +140,20 @@ export default function Contact() {
     return () => tl.kill()
   }, [sent])
 
-  useEffect(
-    () =>
-      onPrefill((detail) => {
-        setSent(false)
-        setData((d) => ({
-          ...d,
-          ...(detail.property ? { property: detail.property } : {}),
-          ...(detail.bill ? { bill: String(detail.bill) } : {}),
-        }))
-      }),
-    [],
-  )
+  useEffect(() => {
+    const apply = (detail) => {
+      setSent(false)
+      setData((d) => ({
+        ...d,
+        ...(detail.property ? { property: detail.property } : {}),
+        ...(detail.bill ? { bill: String(detail.bill) } : {}),
+      }))
+    }
+    // values sent from another page before this form mounted
+    const early = takePrefill()
+    if (early) apply(early)
+    return onPrefill(apply)
+  }, [])
 
   const set = (key) => (e) => {
     setData((d) => ({ ...d, [key]: e.target.value }))
@@ -203,7 +205,7 @@ export default function Contact() {
     <section ref={root} id="contact" className="contact section" data-tone="dark">
       <div className="container contact__grid">
         <div className="contact__intro">
-          <Label index="10">Free site visit</Label>
+          <Label index="01">Free site visit</Label>
           <h2 className="contact__title title" data-reveal="lines">
             Let’s switch
             <br /> your roof <em>on.</em>

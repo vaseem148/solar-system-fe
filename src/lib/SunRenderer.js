@@ -3,6 +3,8 @@
 // sun-lit dust motes, faint lens ghosts and filmic tone mapping.
 // One full-screen triangle, one fragment shader, no libraries.
 
+import { createProgram } from './glProgram'
+
 const VERT = /* glsl */ `
 attribute vec2 aPos;
 void main() { gl_Position = vec4(aPos, 0.0, 1.0); }
@@ -260,7 +262,7 @@ export class SunRenderer {
    *           state: { rise: number, lift: number, scale: number, heat: number, glow?: number } }} options
    *   `glow` (optional, 0–1) brightens and widens the light — the hero drives it on scroll.
    */
-  constructor(canvas, { variant = 'rise', layout, state }) {
+  constructor(canvas, { variant = 'rise', layout, state, onError }) {
     const gl = canvas.getContext('webgl', {
       alpha: false,
       antialias: false,
@@ -283,26 +285,11 @@ export class SunRenderer {
     this.slowFrames = 0
     this.last = 0
 
-    const program = this.#program(VERT, FRAG)
-    gl.useProgram(program)
-
-    const buffer = gl.createBuffer()
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW)
-    const aPos = gl.getAttribLocation(program, 'aPos')
-    gl.enableVertexAttribArray(aPos)
-    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0)
-
-    this.u = Object.fromEntries(UNIFORMS.map((n) => [n, gl.getUniformLocation(program, n)]))
-    const pal = PALETTES[variant] ?? PALETTES.rise
-    this.pal = pal
-    gl.uniform3fv(this.u.uC0, pal.c0)
-    gl.uniform3fv(this.u.uC1, pal.c1)
-    gl.uniform3fv(this.u.uC2, pal.c2)
-    gl.uniform3fv(this.u.uC3, pal.c3)
-    gl.uniform3fv(this.u.uTop, pal.top)
-    gl.uniform3fv(this.u.uBot, pal.bot)
-    gl.uniform1f(this.u.uHaze, pal.haze)
+    // Compiled in the background where the browser allows; #setup() runs once it has linked
+    this.prog = createProgram(gl, VERT, FRAG)
+    this.pal = PALETTES[variant] ?? PALETTES.rise
+    this.onError = onError
+    this.ready = false
 
     // Lens ghosts only make sense when a pointer moves them
     this.finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches
@@ -316,21 +303,44 @@ export class SunRenderer {
     this.resize()
   }
 
-  #program(vs, fs) {
-    const gl = this.gl
-    const compile = (type, src) => {
-      const s = gl.createShader(type)
-      gl.shaderSource(s, src)
-      gl.compileShader(s)
-      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s) ?? 'shader')
-      return s
+  /** True once the program is linked and set up; a failed compile is reported through onError. */
+  #poll() {
+    if (this.ready) return true
+    if (this.failed) return false
+    try {
+      if (!this.prog.ready()) return false
+    } catch (err) {
+      this.failed = true
+      this.pause()
+      this.onError?.(err)
+      return false
     }
-    const p = gl.createProgram()
-    gl.attachShader(p, compile(gl.VERTEX_SHADER, vs))
-    gl.attachShader(p, compile(gl.FRAGMENT_SHADER, fs))
-    gl.linkProgram(p)
-    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p) ?? 'link')
-    return p
+    this.#setup()
+    return true
+  }
+
+  #setup() {
+    const { gl, pal } = this
+    const program = this.prog.program
+    gl.useProgram(program)
+
+    const buffer = gl.createBuffer()
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW)
+    const aPos = gl.getAttribLocation(program, 'aPos')
+    gl.enableVertexAttribArray(aPos)
+    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0)
+
+    this.u = Object.fromEntries(UNIFORMS.map((n) => [n, gl.getUniformLocation(program, n)]))
+    gl.uniform3fv(this.u.uC0, pal.c0)
+    gl.uniform3fv(this.u.uC1, pal.c1)
+    gl.uniform3fv(this.u.uC2, pal.c2)
+    gl.uniform3fv(this.u.uC3, pal.c3)
+    gl.uniform3fv(this.u.uTop, pal.top)
+    gl.uniform3fv(this.u.uBot, pal.bot)
+    gl.uniform1f(this.u.uHaze, pal.haze)
+    this.ready = true
+    this.canvas.style.opacity = '1'
   }
 
   resize() {
@@ -347,6 +357,7 @@ export class SunRenderer {
   }
 
   draw(now) {
+    if (!this.#poll()) return
     const { gl, u, state, mouse, pal } = this
     mouse.x += (mouse.tx - mouse.x) * 0.045
     mouse.y += (mouse.ty - mouse.y) * 0.045
@@ -382,7 +393,7 @@ export class SunRenderer {
 
     // Adaptive quality: drop resolution first, then the atmospheric extras,
     // if the device is struggling
-    if (this.last) {
+    if (this.last && this.ready) {
       const dt = now - this.last
       this.slowFrames = dt > 34 ? this.slowFrames + 1 : Math.max(0, this.slowFrames - 1)
       if (this.slowFrames > 40) {

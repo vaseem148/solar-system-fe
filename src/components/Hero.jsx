@@ -213,8 +213,8 @@ export default function Hero({ ready }) {
             installed and looked after by one Chennai team since {BRAND.since} — one phone number.
           </p>
           <div className="hero__ctas">
-            <Button href="#contact">Book a free site visit</Button>
-            <Button href="#calculator" variant="ghost" icon={<ArrowDown />} iconMotion="s">
+            <Button href="/contact">Book a free site visit</Button>
+            <Button href="/estimate" variant="ghost" icon={<ArrowDown />} iconMotion="s">
               See what you’d save
             </Button>
           </div>

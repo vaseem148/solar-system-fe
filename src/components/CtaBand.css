@@ -1,0 +1,35 @@
+.cta-band {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* a low sun glowing up from under the band */
+.cta-band__sun {
+  position: absolute;
+  z-index: -1;
+  right: -8vw;
+  bottom: -46vw;
+  width: 70vw;
+  height: 70vw;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffd27a 0%, #ff7a2e 22%, rgb(255 90 31 / 0.35) 42%, rgb(255 90 31 / 0) 68%);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.cta-band__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  align-items: end;
+  gap: clamp(32px, 6vw, 110px);
+}
+.cta-band .title em { color: var(--sun); }
+
+.cta-band__side { display: grid; gap: 26px; justify-items: start; }
+.cta-band__actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+@media (max-width: 860px) {
+  .cta-band__inner { grid-template-columns: 1fr; align-items: start; }
+  .cta-band__sun { right: -40vw; bottom: -80vw; width: 140vw; height: 140vw; }
+}

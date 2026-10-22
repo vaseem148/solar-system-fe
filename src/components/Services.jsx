@@ -184,7 +184,7 @@ export default function Services() {
     <section ref={root} id="services" className="svc section" data-tone="light">
       <div className="container">
         <header className="svc__head">
-          <Label index="03">What we do</Label>
+          <Label index="01">What we do</Label>
           <h2 className="title" data-reveal="lines">
             Built for every
             <br /> kind of <em>roof.</em>
@@ -199,7 +199,7 @@ export default function Services() {
           {SERVICES.map((s, i) => (
             <li key={s.title}>
               <a
-                href="#contact"
+                href="/contact"
                 className="svc__row"
                 onPointerEnter={(e) => onEnterRow(i, e)}
                 onFocus={(e) => onEnterRow(i, e)}

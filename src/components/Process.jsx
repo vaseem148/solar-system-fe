@@ -124,7 +124,7 @@ export default function Process() {
       <div className="proc__pin">
         <div className="proc__track">
           <div className="proc__intro">
-            <Label index="06">How we work</Label>
+            <Label index="02">How we work</Label>
             <h2 className="title" data-reveal="lines">
               From first call
               <br /> to <em>first unit.</em>
@@ -156,7 +156,7 @@ export default function Process() {
             <p className="proc__end-title">
               Most homes are generating within <em>six weeks</em> of saying yes.
             </p>
-            <Button href="#contact">Start with a free visit</Button>
+            <Button href="/contact">Start with a free visit</Button>
           </div>
         </div>
         <div className="proc__bar" aria-hidden="true">

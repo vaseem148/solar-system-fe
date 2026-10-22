@@ -137,21 +137,29 @@ export function initScramble(root = document) {
   const triggers = targets.map((el) => {
     prepareScramble(el)
     const len = textOf(el, overlays.get(el)).trim().length
-    return ScrollTrigger.create({
+    const decode = (wait = 0) =>
+      tweens.push(
+        scramble(el, {
+          duration: Math.min(1.15, 0.4 + len * 0.032),
+          delay: wait + (Number(el.dataset.scrambleDelay) || 0),
+        }),
+      )
+    const st = ScrollTrigger.create({
       trigger: el,
       // clamp() so text near the very bottom of the page still decodes; end at max so a jump past it
       // still counts as having entered.
       start: 'clamp(top 92%)',
       end: 'max',
       once: true,
-      onEnter: () =>
-        tweens.push(
-          scramble(el, {
-            duration: Math.min(1.15, 0.4 + len * 0.032),
-            delay: Number(el.dataset.scrambleDelay) || 0,
-          }),
-        ),
+      onEnter: () => decode(),
     })
+    // clamp() also pins anything already on screen at the top of a page to a start of 0, which only
+    // "enters" once you scroll — decode those straight away (after the page transition has lifted)
+    if (st.start <= 0 && !st.progress) {
+      st.kill()
+      decode(0.6)
+    }
+    return st
   })
   return () => {
     triggers.forEach((t) => t.kill())
