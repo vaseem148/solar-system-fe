@@ -13,7 +13,7 @@
 
 .foot__brand { display: grid; align-content: start; gap: 16px; }
 .foot__logo { display: inline-flex; justify-self: start; }
-.foot__logo .logo { height: clamp(48px, 4.4vw, 62px); }
+.foot__logo .logo { height: clamp(78px, 7vw, 100px); }
 .foot__tagline { color: var(--muted); max-width: 28ch; }
 .foot__tamil {
   font-family: var(--tamil);
@@ -83,8 +83,9 @@
   line-height: 0.8;
   letter-spacing: -0.02em;
   text-transform: uppercase;
-  color: var(--ink);
-  -webkit-text-stroke: 1px rgb(242 237 228 / 0.14);
+  /* the client's logo green, silhouetted against the sunset */
+  color: var(--brand-green);
+  -webkit-text-stroke: 1px rgb(242 237 228 / 0.12);
   user-select: none;
 }
 .foot__word span { display: inline-block; }

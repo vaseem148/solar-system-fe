@@ -1,22 +1,23 @@
-import wordmark from '../../assets/brand/wordmark.png'
-import monogram from '../../assets/brand/monogram.png'
+import wordmark from '../../assets/brand/logo-wordmark.png'
+import full from '../../assets/brand/logo-full.png'
+import monogram from '../../assets/brand/logo-monogram.png'
 import { BRAND } from '../../config'
 
-// The client's logo is drawn through a CSS mask (see .logo in global.css), so one transparent PNG
-// takes whatever colour the surface needs: brand green on light sections, bone on dark ones.
+// The client's logo in its own colours (green wordmark, red tagline), cut off its black background.
 
-/** "Suryan Energy Systems" wordmark. Decorative when the surrounding link already names the brand. */
-export function Logo({ className = '', decorative = false }) {
+/** "Suryan Energy Systems"; `tagline` adds the red "use solar energy save green earth" line. */
+export function Logo({ className = '', tagline = false, decorative = false }) {
   return (
-    <span
-      className={`logo ${className}`}
-      style={{ '--logo-src': `url(${wordmark})` }}
-      {...(decorative ? { 'aria-hidden': true } : { role: 'img', 'aria-label': BRAND.legalName })}
+    <img
+      className={`logo ${tagline ? 'logo--full' : ''} ${className}`}
+      src={tagline ? full : wordmark}
+      alt={decorative ? '' : BRAND.legalName}
+      draggable="false"
     />
   )
 }
 
 /** The stacked "SE" monogram on its own. */
 export function Monogram({ className = '' }) {
-  return <span className={`logo logo--mark ${className}`} style={{ '--logo-src': `url(${monogram})` }} aria-hidden="true" />
+  return <img className={`logo logo--mark ${className}`} src={monogram} alt="" draggable="false" />
 }

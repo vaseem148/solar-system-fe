@@ -32,8 +32,6 @@
 .nav__logo { justify-self: start; display: inline-flex; align-items: center; }
 .nav__logo .logo { height: 38px; transform-origin: 0% 50%; }
 .nav__logo:hover .logo { transform: scale(1.04); }
-/* the open menu is dark whatever section is behind it */
-.menu-open .nav { --logo-color: var(--bone); }
 
 .nav__links {
   position: relative;

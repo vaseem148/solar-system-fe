@@ -11,7 +11,6 @@ export const PAGES = [
   { path: '/services', label: 'Services', title: 'Solar installation & maintenance — Suryan Energy Systems' },
   { path: '/how-it-works', label: 'How it works', title: 'How rooftop solar works — Suryan Energy Systems' },
   { path: '/blog', label: 'Blog', title: 'Blog — Suryan Energy Systems' },
-  { path: '/faq', label: 'FAQ', title: 'Solar questions, answered — Suryan Energy Systems' },
   { path: '/contact', label: 'Contact', title: 'Contact us — Suryan Energy Systems' },
   { path: '/estimate', label: 'Free estimate', title: 'Get a free solar estimate — Suryan Energy Systems', nav: false },
 ]

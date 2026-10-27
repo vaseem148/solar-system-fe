@@ -320,16 +320,17 @@ export default function App() {
             }
           />
           <Route path="/estimate" element={<Calculator />} />
+          {/* the FAQ lives on the Contact page, under the form */}
           <Route
-            path="/faq"
+            path="/contact"
             element={
               <>
+                <Contact />
                 <Faq />
-                <CtaBand />
               </>
             }
           />
-          <Route path="/contact" element={<Contact />} />
+          <Route path="/faq" element={<Navigate to={{ pathname: '/contact', hash: '#faq' }} replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

@@ -122,7 +122,7 @@ export default function Footer() {
       <div className="container foot__top">
         <div className="foot__brand">
           <a href="/" className="foot__logo" aria-label={`${BRAND.legalName} — home`}>
-            <Logo decorative />
+            <Logo decorative tagline />
           </a>
           <p className="foot__tagline">
             {BRAND.tagline} Solar plants, water heaters, street lights and pumps — Chennai, since {BRAND.since}.

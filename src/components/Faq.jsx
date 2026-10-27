@@ -107,7 +107,7 @@ export default function Faq() {
     <section ref={root} id="faq" className="faq section" data-tone="light">
       <div className="container faq__grid">
         <header className="faq__head">
-          <Label index="01">FAQ</Label>
+          <Label index="02">FAQ</Label>
           <h2 className="title" data-reveal="lines">
             Questions,
             <br /> <em>answered.</em>

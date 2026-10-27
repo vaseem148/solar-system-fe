@@ -19,6 +19,7 @@
   --sun: #ff5a1f;
   --sun-hot: #ff7a2e;
   --gold: #ffb23f;
+  --brand-green: #2b6238; /* from the client's logo */
   --ember: #c2410c;
   --leaf: #3ddc84;
 
@@ -60,23 +61,20 @@
   --muted: rgb(20 18 15 / 0.62);
   --line: rgb(20 18 15 / 0.14);
   --card: #e6dece;
-  --logo-color: #2d6a3e;
   color-scheme: light;
 }
 [data-tone] { background-color: var(--bg); color: var(--fg); }
 
-/* The client's logo (components/ui/Logo.jsx): a mask, so it takes --logo-color — bone by default */
+/* The client's logo (components/ui/Logo.jsx), always in its own green and red */
 .logo {
-  display: inline-block;
+  display: block;
   flex: none;
   height: 1em;
-  aspect-ratio: 4.04;
-  background-color: var(--logo-color, var(--fg));
-  -webkit-mask: var(--logo-src) center / contain no-repeat;
-  mask: var(--logo-src) center / contain no-repeat;
-  transition: background-color 0.5s var(--ease-io), transform 0.9s var(--ease);
+  width: auto;
+  max-width: none;
+  user-select: none;
+  transition: transform 0.9s var(--ease);
 }
-.logo--mark { aspect-ratio: 0.5095; }
 
 /* Sections that sit on their own fixed dark surface */
 .on-dark {
@@ -384,7 +382,6 @@ em { font-style: normal; }
 .curtain {
   --sun: #fff1c9;
   --bg: #ff5a1f;
-  --logo-color: var(--ink);
   position: fixed;
   inset: 0;
   z-index: 8800;
