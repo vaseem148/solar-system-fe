@@ -121,7 +121,7 @@ export default function Footer() {
     <footer ref={root} className="foot on-dark" data-tone="dark">
       <div className="container foot__top">
         <div className="foot__brand">
-          <a href="/" className="foot__logo" aria-label={`${BRAND.legalName} — home`}>
+          <a href="/" className="foot__logo logo-plate" aria-label={`${BRAND.legalName} — home`}>
             <Logo decorative tagline />
           </a>
           <p className="foot__tagline">
@@ -198,7 +198,9 @@ export default function Footer() {
         </p>
         <p className="foot__word" aria-hidden="true" style={{ '--chars': BRAND.name.length }}>
           {BRAND.name.split('').map((ch, i) => (
-            <span key={i}>{ch}</span>
+            <span key={i} style={{ '--i': i }}>
+              {ch}
+            </span>
           ))}
         </p>
       </div>

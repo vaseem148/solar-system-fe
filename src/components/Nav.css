@@ -29,8 +29,9 @@
 .menu-open .nav::before { opacity: 0; }
 .menu-open .nav { color: var(--bone); transform: none; }
 
-.nav__logo { justify-self: start; display: inline-flex; align-items: center; }
-.nav__logo .logo { height: 38px; transform-origin: 0% 50%; }
+/* GSAP animates the link itself in the intro, so the hover lift lives on the image inside */
+.nav__logo { justify-self: start; font-size: 14px; }
+.nav__logo .logo { height: 44px; transform-origin: 50% 50%; }
 .nav__logo:hover .logo { transform: scale(1.04); }
 
 .nav__links {
@@ -178,5 +179,5 @@
 
 @media (max-width: 560px) {
   .nav__cta { display: none; }
-  .nav__logo .logo { height: 32px; }
+  .nav__logo .logo { height: 36px; }
 }

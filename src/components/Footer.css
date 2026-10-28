@@ -13,6 +13,7 @@
 
 .foot__brand { display: grid; align-content: start; gap: 16px; }
 .foot__logo { display: inline-flex; justify-self: start; }
+.foot__logo { font-size: 16px; }
 .foot__logo .logo { height: clamp(78px, 7vw, 100px); }
 .foot__tagline { color: var(--muted); max-width: 28ch; }
 .foot__tamil {
@@ -83,12 +84,32 @@
   line-height: 0.8;
   letter-spacing: -0.02em;
   text-transform: uppercase;
-  /* the client's logo green, silhouetted against the sunset */
-  color: var(--brand-green);
-  -webkit-text-stroke: 1px rgb(242 237 228 / 0.12);
   user-select: none;
 }
-.foot__word span { display: inline-block; }
+/* The client's logo green as a silhouette against the sunset: a golden cap where the last light
+   catches the top, sinking into the dark hills below, a warm rim — and every few seconds a sheen of
+   sunlight runs across the letters, one after another */
+.foot__word span {
+  display: inline-block;
+  color: transparent;
+  background-image:
+    linear-gradient(105deg, transparent 42%, rgb(255 226 160 / 0.6) 50%, transparent 58%),
+    linear-gradient(180deg, #f0b25e 0%, #8fbf6a 5%, #3f8a4c 14%, #2b6238 30%, #1a4126 55%, #0e2617 80%, #0a1a10 100%);
+  background-size: 300% 100%, 100% 100%;
+  background-position: 150% 0, 0 0;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-stroke: 1.5px rgb(255 176 120 / 0.32);
+  animation: foot-sheen 7s calc(var(--i, 0) * 0.14s + 1.5s) ease-in-out infinite;
+}
+@keyframes foot-sheen {
+  0% { background-position: 150% 0, 0 0; }
+  22%, 100% { background-position: -50% 0, 0 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .foot__word span { animation: none; }
+}
 
 .foot__legal {
   position: relative;

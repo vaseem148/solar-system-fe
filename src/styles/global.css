@@ -75,6 +75,15 @@
   user-select: none;
   transition: transform 0.9s var(--ease);
 }
+/* A cream plate behind the logo, so its dark green reads on dark sections too */
+.logo-plate {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.32em 0.7em 0.32em 0.55em;
+  border-radius: 0.6em;
+  background: #f4efe6;
+  box-shadow: 0 0 0 1px rgb(20 18 15 / 0.06), 0 10px 28px -14px rgb(0 0 0 / 0.55);
+}
 
 /* Sections that sit on their own fixed dark surface */
 .on-dark {

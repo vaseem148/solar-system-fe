@@ -76,7 +76,9 @@ export default function Preloader({ onReveal }) {
       <div className="pre__top mono">
         <span className="pre__reveal">
           <span>
-            <Logo className="pre__logo" />
+            <span className="logo-plate pre__plate">
+              <Logo className="pre__logo" />
+            </span>
           </span>
         </span>
         <span className="pre__reveal">

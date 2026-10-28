@@ -121,7 +121,7 @@ export default function Nav({ ready }) {
   return (
     <>
       <header ref={bar} className="nav">
-        <a href="/" className="nav__logo" aria-label={`${BRAND.legalName} — home`} onClick={close}>
+        <a href="/" className="nav__logo logo-plate" aria-label={`${BRAND.legalName} — home`} onClick={close}>
           <Logo decorative />
         </a>
 
