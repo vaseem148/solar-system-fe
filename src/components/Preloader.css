@@ -22,8 +22,8 @@
   vertical-align: top;
 }
 .pre__reveal > span { display: inline-block; }
-.pre__plate { font-size: 12px; }
-.pre__logo { height: clamp(30px, 2.8vw, 38px); }
+.pre__plate { font-size: 12px; vertical-align: top; }
+.pre__logo { height: clamp(42px, 3.6vw, 52px); }
 
 .pre__sun {
   position: absolute;

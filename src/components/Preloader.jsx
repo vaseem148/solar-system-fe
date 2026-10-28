@@ -77,7 +77,7 @@ export default function Preloader({ onReveal }) {
         <span className="pre__reveal">
           <span>
             <span className="logo-plate pre__plate">
-              <Logo className="pre__logo" />
+              <Logo className="pre__logo" tagline />
             </span>
           </span>
         </span>
